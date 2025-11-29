@@ -1,0 +1,10 @@
+===add===
+ 
+- transaction history
+- multiple user based 
+- inventory 
+- stock levels
+- admin functions to add/remove balance and increase/decrease stock
+
+
+- more to come soon
