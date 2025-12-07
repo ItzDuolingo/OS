@@ -1,13 +1,13 @@
-#Vending machine game
+# Vending machine game
 
-##features
+## features
 - User login system (for now)
 - basic menu selection highlits with []
 - Sell/buy functions
 - basic file I/O like checking if user exists or writing transaction history or writing and checking balance
 - presistent balance
 
- ##changelog
+ ## changelog
 
  ### v0.1
  - basic user interface
