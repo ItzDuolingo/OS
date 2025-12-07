@@ -1,18 +1,26 @@
-Recent changes:
+#Vending machine game
 
-- function whoIsPlaying() got new table entries
-- functions buy() and sell() modified to now accept s and w keys to move [] up and down to select options instead of typing out a number
-- function opts() changed to navigate() with same functions as buy() and sell() functions
-- function transactionHistory(user, text) now logs if the person bought/sold what and for how much into their designated .txt file named after their username in "Operating_System/stats/balance/"
-- function loadBalance() now opens a .txt file named after the user and checks the very last line for a positive digit, converts into number and stores into newBalance which then replaces local balance if the user has some transaction history
+##features
+- User login system (for now)
+- basic menu selection highlits with []
+- Sell/buy functions
+- basic file I/O like checking if user exists or writing transaction history or writing and checking balance
+- presistent balance
 
-new functions:
+ ##changelog
 
-- transactionHistory(user, text)
-- loadBalance(user)
-- inventory(user)
-- loadInventory(user)
-- navigate()
+ ### v0.1
+ - basic user interface
+ - really bare bones
+ -  checking if user exists
+ -  buying items
 
-
-That's all for now, more to come soon
+ ### v0.2
+ - sell/buy functions
+ - checking if balance exists
+ - logging history of buying/selling
+ - selected items are now highlited in [] rather than making the user write the number of a item
+ - user interface selection can now be moved with w and s keys
+   
+   
+ 
