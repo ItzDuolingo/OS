@@ -2,11 +2,20 @@ local items = {
     {name = "apple", price = 5},
     {name = "juice", price = 6},
     {name = "melon", price = 2},
-    {name = "cheez", price = 69},
+    {name = "chez", price = 69},
     {name = "potato sam", price = 67},
 }
 
+local defaultInventory = {
+    apple = 0,
+    juice = 0,
+    melon = 0,
+    chez = 0,
+    ["potato sam"] = 0
+} 
+
 local balance = 100
+local inventory = {}
 
 -- shows a menu asking the user for their name, then searches for the file with the name and loads the game if it exists
 function whoIsPlaying()
@@ -19,7 +28,7 @@ function whoIsPlaying()
         user.name = username
         user.path = "Operating_System/users/"..username..".txt"
         user.balancePath = "Operating_System/stats/balance/"..username..".txt"
-        user.inventoryPath = "Operating_System/stats/inventory/"..username..".txt"
+        user.inventoryPath = "Operating_System/stats/inventory/"..username..".json"
     
         if fs.exists(user.path) then
             term.setCursorPos(1,3)
@@ -35,6 +44,52 @@ function whoIsPlaying()
                 sleep(2)   
          end  
     end        
+end
+
+-- ensures that the inventory exists in .json file if not it creates it 
+function ensureInvExists(user)
+    if not fs.exists(user.inventoryPath) then
+        local file = fs.open(user.inventoryPath,"w")
+        file.write(textutils.serialize(defaultInventory))
+        file.close()
+    end
+end
+
+-- before loading the inventory of currently signed in user it runs the function to ensure that inventory exists
+function loadInv(user)
+    ensureInvExists(user)
+    local file = fs.open(user.inventoryPath, "r")
+    local data = file.readAll()
+    file.close()
+
+    inventory = textutils.unserialize(data) or defaultInventory
+end
+
+-- self explenatory
+function saveInv(user)
+    local file = fs.open(user.inventoryPath, "w")
+    file.write(textutils.serialize(inventory))
+    file.close()
+end
+
+-- self explenatory
+function openInv(user)
+    loadInv(user)
+    while true do
+        term.clear()
+        term.setCursorPos(1,1)
+        print("===Inventory===\n")
+        
+        for name, amount in pairs(inventory) do
+            print(name .. " - " .. amount .. " pcs")
+        end
+
+        print("\nPress backspace to return")
+        local event, key = os.pullEvent("key")
+        if key == keys.backspace then
+        return
+        end 
+    end
 end
 
 --[[ uses the user.path to look for the file named after username, opens it, reads the very last line, tries to convert it into number and match it 
@@ -57,21 +112,12 @@ function loadBalance(user)
     end
 end
 
--- not done yet
-function inventory(user)
-
-end
-
--- not done yet
-function loadInventory(user)
-
-end
-
 --[[prints out the items table, and highlights the currently selecetd item in [] and the highlit works same as in the navigate() after selecting a item it 
-reduces balance by the price of the item and writes the transaction into a file named after username 
+reduces balance by the price of the item and writes the transaction into a file named after username
+it also checks if the user has enough balance in order to buy  
 ]]
 function buy(user)
-
+    loadInv(user)
     local selected = 1
 
     while true do
@@ -84,13 +130,15 @@ function buy(user)
         
         term.setCursorPos(1,5)
         for i, item in ipairs(items) do
+            local owned = inventory[item.name] or 0
             if i == selected then 
-                print("["..i.."."..item.name.." - "..item.price.." coins]")
+                print("["..i.."."..item.name.." - "..item.price.." coins] (owned "..owned.." pcs)")
             else
-                print(""..i.."."..item.name.." - "..item.price.." coins")
+                print(""..i.."."..item.name.." - "..item.price.." coins (owned "..owned.." pcs)")
             end
         end
-
+         
+            print("\nPress Backspace to Return")
             local event, key = os.pullEvent("key")
 
             if key == keys.w then
@@ -103,7 +151,10 @@ function buy(user)
                 local chosenItem = items[selected]
             if chosenItem and balance >= chosenItem.price then
                 balance = balance - chosenItem.price
-             
+                inventory[chosenItem.name] = (inventory[chosenItem.name] or 0) + 1
+                saveInv(user)
+
+
                 term.setCursorPos(1,1)
                 term.clearLine()
                 write("Your balance is "..balance.." coins")
@@ -112,68 +163,76 @@ function buy(user)
                 print("Your new balance is "..balance.." coins")
                 transactionHistory(user, "Bought: "..chosenItem.name.." for "..chosenItem.price.." coins") 
                 transactionHistory(user, "new balance is "..balance)
-                --print("Your new balance is: "..balance.." coins")
-                return
                 sleep(2)
+                
             else
                 print("Not enough coins!")
-                sleep(1)  
+                sleep(1)
+            end
+                elseif key == keys.backspace then
+                return
             end
         end
-    end
-end
-
     
+    end 
 
--- same as buy function but this time it adds to balance
+-- same as buy function but this time it adds to balance and it also checks if the user has enough items to sell
 function sell(user)
-
+    loadInv(user)
     local selected = 1
 
     while true do
         term.clear()
         term.setCursorPos(1,1)
         print("Your balance is "..balance.." coins")
-        
         term.setCursorPos(1,3)
         print("Item menu: ")
-        
         term.setCursorPos(1,5)
+        
         for i, item in ipairs(items) do
+            local owned = inventory[item.name] or 0
             if i == selected then 
-                print("["..i.."."..item.name.." - "..item.price.." coins]")
+                print("["..i.."."..item.name.." - "..item.price.." coins] (owned "..owned.." pcs)")
             else
-                print(""..i.."."..item.name.." - "..item.price.." coins")
+                print(" "..i.."."..item.name.." - "..item.price.." coins (owned "..owned.." pcs)")
             end
         end
+        
+        print("\nPress Backspace to Return!")
+        local event, key = os.pullEvent("key")
 
-            local event, key = os.pullEvent("key")
-
-            if key == keys.w then
-                selected = selected -1
-                if selected < 1 then selected = #items end
-            elseif key == keys.s then
-                selected = selected +1
-                if selected > #items then selected = 1 end
-            elseif key == keys.enter then
-                local chosenItem = items[selected]
-            if chosenItem and balance >= chosenItem.price then
-                balance = balance + chosenItem.price
-             
+        if key == keys.w then
+            selected = selected -1
+            if selected < 1 then selected = #items end
+        elseif key == keys.s then
+            selected = selected +1
+            if selected > #items then selected = 1 end
+        elseif key == keys.enter then
+            local chosenItem = items[selected]
+            local owned = inventory[chosenItem.name] or 0 
+            
+            if owned > 0 then
+                balance = balance + chosenItem.price 
+                inventory[chosenItem.name] = owned - 1
+            
+                saveInv(user)
+                
                 term.setCursorPos(1,1)
                 term.clearLine()
                 write("Your balance is: "..balance.." coins")
                 term.setCursorPos(1,11)
-                print("You sold "..chosenItem.name.." for ".. chosenItem.price.." coins")
-                transactionHistory(user, "Sold: "..chosenItem.name.." for "..chosenItem.price.." coins, new balance is") 
-                transactionHistory(user, balance)
-                print("Your new balance is "..balance.." coins")
-                return
+                print("You sold "..chosenItem.name.." for "..chosenItem.price.." coins")
+                print("your new balance is "..balance)
+                transactionHistory(user, "Sold: "..chosenItem.name.." for "..chosenItem.price.." coins")
+                transactionHistory(user, "new balance is "..balance.." coins")
                 sleep(2)
+                
             else
-                print("Not enough coins!")
-                sleep(1)  
+                print("No "..chosenItem.name.." to sell!")
+                sleep(1)
             end
+        elseif key == keys.backspace then
+            return
         end
     end
 end
@@ -181,11 +240,13 @@ end
 local options = {    
     {option = "Buy", action = "Buy"},
     {option = "Sell", action = "Sell"},
+    {option = "Open Inventory", action = "OpenInv"},
 }
 
 local actions = {
     Buy = buy,
     Sell = sell,
+    OpenInv = openInv,
 }
 
 -- writes what the user bought/sold and for how much into a file named after the user 
@@ -225,8 +286,6 @@ function navigate(user)
             elseif key == keys.enter then
                 local chosen = options[selected]
                 actions[chosen.action](user)
-            return
-                
             end
         end
     end
