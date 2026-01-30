@@ -37,7 +37,7 @@
 - I haven't made a function to centerlize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
 - This code is NOT made for monitors, it is only made to be used on the terminal for now tho i intend to introduce monitor support later in the future
 
-### Additional notes
+#### Additional notes
 - This code is still in work, it serves as a learning project for me to get to know coding therfore use it at your own risk and don't hate on me, please
 - If you have any questions and/or suggestions on how i could change and/or improve the code feel free to contact me on discord at duolingo6954
 - the Vending machine game that is stated below is NOT accesable trough the OS so far
