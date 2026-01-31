@@ -35,8 +35,9 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 
 ### Known issues
 - When the read event is triggered during registration/login you can't use F1 to return, fix not found yet
+- "Guest" account isn't fully integrated, it isn't written to memory, it has the same privilages as a normal user and if the username "guest" is entered at registration it will create a normal user with presistent data and can be logged into
 - The clock won't update during login/register due to the read event being triggered
-- There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, so far didn't find a fix
+- There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, fix not found yet
 - I haven't made a function to centerlize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
 - This code is NOT made for monitors, it is only made to be used on the terminal for now tho i intend to introduce monitor support later in the future
 - SECURITY WARNING: "terminate" event is not being handled so far so be aware that anyone even basic user can terminate the code at any time and access cc:tweaked terminal  
