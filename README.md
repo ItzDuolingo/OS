@@ -1,6 +1,6 @@
 # Operating System (CC:Tweaked)
 A mock operating system project for cc:tweaked
-It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file presistance and it serves primaly as a learning project
+It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file presistence and it serves primarly as a learning project
 
 ## Features
 - User login/register system
@@ -17,8 +17,19 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 - User deletion
 - Ability to change user's passwords
 - Ability to promote users to admins
+- Ability to demote admins to users
+- Ability for devs to promote users or/and admins to devs
+- Ability for devs to demote admins and devs to users
+- NOTE: All dev functions are dev exclusive
 
 ## Changelog
+
+### v1.1
+- Admins and devs can now demote other admins to users
+- Devs can now promote admins and users to devs
+- Devs can now demote devs to users
+- Devs have the same access as admins inside of the admin dashboard
+- Admin dashboard now has dev specific options
 
 ### v1.0
 - Initial usable version 
@@ -38,8 +49,9 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 - "Guest" account isn't fully integrated, it isn't written to memory, it has the same privilages as a normal user and if the username "guest" is entered at registration it will create a normal user with presistent data and can be logged into
 - The clock won't update during login/register due to the read event being triggered
 - There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, fix not found yet
-- I haven't made a function to centerlize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
+- I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
 - This code is NOT made for monitors, it is only made to be used on the terminal for now tho i intend to introduce monitor support later in the future
+- Custom installation process is missing (no pastebin or wget) for now refer to the installation steps below
 - SECURITY WARNING: "terminate" event is not being handled so far so be aware that anyone even basic user can terminate the code at any time and access cc:tweaked terminal  
 
 ## Additional notes
@@ -51,7 +63,6 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 1. Download all files from this repository
 2. Copy them into your game files, if you don't know where your game files are reference to the guide below
 3. Run "menuMain.lua" in the ingame terminal
-For the time being this code does NOT have pastebin, tho future versions (hopefully v1.1) will have pastebin
 
 How to find your game files: (modrinth)
 1. Press windows + r on your keyboard
@@ -84,19 +95,16 @@ This program is currently a standalone and not a part of the OS
 - presistent balance
 
  ## changelog
+  
+  ### v0.2
+ - Sell/buy functions
+ - Checking if balance exists
+ - Logging history of buying/selling
+ - Selected items are now highlited in [] rather than making the user write the number of a item
+ - User interface selection can now be moved with w and s keys
 
  ### v0.1
- - basic user interface
- - really bare bones
- -  checking if user exists
- -  buying items
-
- ### v0.2
- - sell/buy functions
- - checking if balance exists
- - logging history of buying/selling
- - selected items are now highlited in [] rather than making the user write the number of a item
- - user interface selection can now be moved with w and s keys
-   
-   
- 
+ - Basic user interface
+ - Really bare bones
+ - Checking if user exists
+ - Buying items
