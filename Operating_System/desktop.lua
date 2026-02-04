@@ -1,20 +1,17 @@
 -- required modules
 local users = require("lib.users")
+local state = require("lib.state")
 local appsLib = require("lib.appsData")
 local apps = appsLib.defaultApps()
 local header = require("UI.header")
 local navigation = require("UI.navigationHelp")
 local selectionLib = require("lib.selection")
+local state = require("lib.state")
 local powerLib = require("lib.power")
 local powerOptionsActions = powerLib.powerOptionsActions
--- ==================================
--- collect argument from menuMain.lua
--- ==================================
-local args = { ... }
-local username = args[1] or "guest" 
--- if you wish this code to be only used for one user (you or anyone else, simply not multi-user based)
--- then replace "guest" with anything you want and it will be used as the username therfore you can run desktop.lua right away instead of running menuMain.lua at the start
--- note: The name you put instead of "guest" must exist within the OS directory 
+
+-- Guest function removed for now
+local username = state.getUsername() 
 
 local optionsActions = {}
 local meta = users.loadUserMeta(username)
@@ -33,7 +30,7 @@ for appName, app in pairs(apps) do
             table.insert(optionsActions, {
                 name = appName:gsub("_", " "),
                 action = function()
-                    shell.run(app.code_path, username) 
+                    shell.run(app.code_path)
                 end
             })
         end
