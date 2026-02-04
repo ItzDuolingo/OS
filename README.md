@@ -3,6 +3,16 @@ A mock operating system project for cc:tweaked
 It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file presistence and it serves primarly as a learning project
 I HEAVILY recommend reading the known issues and additional notes before installing this 
 
+## Contents
+- [Features](#features)
+- [Admin Dashboard](#admin-dashboard)
+- [Dev Tools](#dev-tools)
+- [Roadmap](#roadmap)
+- [Changelog](#changelog)
+- [Known Issues](#known-issues)
+- [Installation](#installation-steps)
+
+
 ## Features
 - User login/register system
 - Basic meta data handling (.json files)
@@ -75,7 +85,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ### Known issues
 - When the read event is triggered during registration/login you can't use F1 to return, fix not found yet
-- "Guest" account isn't fully integrated, it isn't written to memory, it has the same privilages as a normal user and if the username "guest" is entered at registration it will create a normal user with presistent data and can be logged into -- !GUEST ACCOUNT HAS BEEN REMOVED FOR THE TIME BEING!
+- "Guest" account has been temporarily removed and is not available in current versions
 - The clock won't update during login/register due to the read event being triggered
 - There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, fix not found yet
 - I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
