@@ -1,15 +1,17 @@
 -- required modules
 local users = require("lib.users")
 local appsLib = require("lib.appsData")
+local logs = require("lib.writeLog")
 local apps = appsLib.defaultApps()
 local navigation = require("UI.navigationHelp")
 local powerLib = require("lib.power")
+local state = require("lib.state")
 local powerOptionsActions = powerLib.powerOptionsActions
 local selectionLib = require("lib.selection")
 local header = require("UI.header")
 
 -- =======================================
--- draws the boxes for pass and name input
+-- Draws the boxes for pass and name input
 -- =======================================
 local function drawBox(x, y, width, height, color)
     term.setBackgroundColor(color)
@@ -20,9 +22,8 @@ local function drawBox(x, y, width, height, color)
 end
 
 -- ==============================================================================
--- draws the register UI and creates needed data/files for a user at registration
+-- Draws the register UI and creates needed data/files for a user at registration
 -- ==============================================================================
-
 local function register()
     while true do
         term.setBackgroundColor(colors.lightGray)
@@ -62,6 +63,7 @@ local function register()
         term.setCursorPos(13,7)
         term.setTextColor(colors.white)
         local username = read()
+        state.setUsername(username)
         
         -- collecting password input inside boxes 
         term.setCursorPos(13,10)
@@ -72,7 +74,6 @@ local function register()
         local passwordPath = userPath.."/password.txt"
         local appsPath = userPath .. "/apps.json"
         local metaPath = userPath .. "/meta.json"
-        --username = username:match("^%s*(.-)%s*$")
         if username == "admin" or username == "admins" or username == "dev" or username == "developer" or username == "developers" or username == "devs" or username == "guest" then 
             term.setCursorPos(13,12)
             term.setTextColor(colors.red)
@@ -110,6 +111,7 @@ local function register()
             local f3 = fs.open(metaPath, "w")
             f3.write(textutils.serialize(meta))
             f3.close()
+            logs.logger("register", " registered")
 
             term.setCursorPos(13,12)
             term.setTextColor(colors.green)
@@ -119,10 +121,10 @@ local function register()
         end
     end  
 end
--- ================================================================================
--- draws the login UI, checks for admin, passes along username and launches dekstop
--- ================================================================================
 
+-- ================================================================================
+-- Draws the login UI, checks for admin, passes along username and launches dekstop
+-- ================================================================================
 local function login()
     while true do
         term.setBackgroundColor(colors.lightGray)
@@ -161,10 +163,13 @@ local function login()
         term.setCursorPos(13,7)
         term.setTextColor(colors.white)
         local username = read()
+        state.setUsername(username)
+        
 
         -- collecting password input inside box
         term.setCursorPos(13,10)
         local pass = read("*")
+
 
         -- neccessary path for this function
         local path = "operatingSystem/users/" .. username.."/password.txt"
@@ -183,6 +188,7 @@ local function login()
             local file = fs.open(path, "r")
             local stored = file.readAll()
             file.close()
+            logs.logger("login", " logged in")
         
             if stored == pass then
                 term.setBackgroundColor(colors.lightGray)
@@ -198,7 +204,7 @@ local function login()
                 term.setCursorPos(20,9)
                 print("Welcome, " ..username)
                 sleep(1)
-                shell.run("desktop.lua", username)
+                shell.run("desktop.lua")--, username
                 return true 
             else
                 term.setTextColor(colors.red)
@@ -210,14 +216,16 @@ local function login()
 
     end
 end
+
 -- =========================
--- options and actions table
+-- Options and actions table
 -- =========================
 local optionsActions = {
     {name = "Login", action = login},
     {name = "Register", action = register},    
 }
+
 -- ==========================================
--- start of code - refer to the selection.lua
+-- Start of code - refer to the selection.lua
 -- ==========================================
 selectionLib.selection(powerOptionsActions, optionsActions, 22, 6, 42 ,18,"", nil, "=== Choose an option ===",16, 3, false )
