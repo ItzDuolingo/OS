@@ -26,6 +26,8 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Access native cc:tweaked terminal,
 - Ability to demote devs to users and promote users to devs
 
+# Roadmap 
+
 ## Changelog
 
 ### v1.2
