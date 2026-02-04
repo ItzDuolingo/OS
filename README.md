@@ -29,17 +29,27 @@ I HEAVILY recommend reading the known issues and additional notes before install
 # Roadmap
 
 ### In progress
+- Settings for desktop
 
 ### Planned
-
+- App store for desktop
+- File explorer for desktop
+- Custom read and key pulling event to be able to pull events so that you can both write and use keybinds at the same time
+- Custom crollable UI for dev logs
+- Custom installation proccess that uses pastebin combined with wget to let users download the code more comfortably
+  
 ### Ideas (not 100% planned)
+- Monitor support
+- Pocket computer support
+- Some application to send messages from computer to computer utilizing rednet
+- Some custom games that utilize turtles and rednet 
 
 ## Changelog
 
 ### v1.2
 - Dev tools have been added
-- Username is now saved to state instead of being passed along as a argument
-- Certain functions are now being logged to a .txt file
+- Username is now saved to state instead of being passed along as a argument so that it can be used across modules
+- Certain functions are now being logged to a .txt file (logging in for example)
 - Messages module has been added to clear up code and make it more modular
 - Guest account has been removed for the time being
 
