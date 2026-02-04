@@ -1,6 +1,7 @@
 # Operating System (CC:Tweaked)
 A mock operating system project for cc:tweaked
 It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file presistence and it serves primarly as a learning project
+I HEAVILY recommend reading the known issues and additional notes before installing this 
 
 ## Features
 - User login/register system
@@ -8,21 +9,31 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 - Dev -> Admin -> User hierarchy
 - File I/O
 - Admin dashboard
+- Dev tools
 - Keyboard input (UI Navigation)
 - UI Drawing and navigation
 - Multiple menus
 - Permission handling
-
+  
 ### Admin Dashboard
 - User deletion
 - Ability to change user's passwords
 - Ability to promote users to admins
 - Ability to demote admins to users
-- Ability for devs to promote users or/and admins to devs
-- Ability for devs to demote admins and devs to users
-- NOTE: All dev functions are dev exclusive
+
+### Dev Tools
+- Ability to view logs
+- Access native cc:tweaked terminal,
+- Ability to demote devs to users and promote users to devs
 
 ## Changelog
+
+### v1.2
+- Dev tools have been added
+- Username is now saved to state instead of being passed along as a argument
+- Certain functions are now being logged to a .txt file
+- Messages module has been added to clear up code and make it more modular
+- Guest account has been removed for the time being
 
 ### v1.1
 - Admins and devs can now demote other admins to users
@@ -46,7 +57,7 @@ It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User
 
 ### Known issues
 - When the read event is triggered during registration/login you can't use F1 to return, fix not found yet
-- "Guest" account isn't fully integrated, it isn't written to memory, it has the same privilages as a normal user and if the username "guest" is entered at registration it will create a normal user with presistent data and can be logged into
+- "Guest" account isn't fully integrated, it isn't written to memory, it has the same privilages as a normal user and if the username "guest" is entered at registration it will create a normal user with presistent data and can be logged into -- !GUEST ACCOUNT HAS BEEN REMOVED FOR THE TIME BEING!
 - The clock won't update during login/register due to the read event being triggered
 - There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, fix not found yet
 - I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
