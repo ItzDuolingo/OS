@@ -41,12 +41,12 @@ I HEAVILY recommend reading the known issues and additional notes before install
 ### In progress
 - Settings for desktop
 - refactor of selectionLib
-
+- Custom scrollable UI for dev logs
+  
 ### Planned
 - App store for desktop
 - File explorer for desktop
 - Custom read and key pulling event to be able to pull events so that you can both write and use keybinds at the same time
-- Custom crollable UI for dev logs
 - Custom installation proccess that uses pastebin combined with wget to let users download the code more comfortably
   
 ### Ideas (not 100% planned)
