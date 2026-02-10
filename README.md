@@ -40,6 +40,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ### In progress
 - Settings for desktop
+- refactor of selectionLib
 
 ### Planned
 - App store for desktop
