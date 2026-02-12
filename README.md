@@ -35,13 +35,13 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Ability to view logs
 - Access native cc:tweaked terminal,
 - Ability to demote devs to users and promote users to devs
+- Ability to reset settings to defaults
 
 # Roadmap
 
 ### In progress
 - Settings for desktop
 - refactor of selectionLib
-- Custom scrollable UI for dev logs
   
 ### Planned
 - App store for desktop
