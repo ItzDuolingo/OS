@@ -3,6 +3,9 @@ package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. 
 local users = require("lib.users")
 local perms = require("lib.permissions")
 local state = require("lib.state")
+local settings = require("lib.settingsManager")
+local settingsLib = require("lib.defaultSettings")
+local defaultSettings = settingsLib.defaultSettings()
 local logs = require("lib.writeLog")
 local header = require("UI.header")
 local messages = require("UI.messages")
@@ -12,35 +15,6 @@ local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
 -- username
 local username = state.getUsername() 
-
--- ===========================================================
--- Functions to open log files in the native cc:Tweaked editor
--- ===========================================================
-local function adminLog()
-    shell.run("edit", "/operatingSystem/logs/admin.txt")
-end
-
-local function devLog()
-    shell.run("edit", "/operatingSystem/logs/dev.txt")
-end
-
-local function loginLog()
-    shell.run("edit", "/operatingSystem/logs/login.txt")
-end
-
-local function registerLog()
-    shell.run("edit", "/operatingSystem/logs/register.txt")
-end
-
--- ================================
--- Options and actions for the logs
--- ================================
-local logOptions = {
-    {name = "Admin logs",     action = adminLog},
-    {name = "Developer logs", action = devLog},
-    {name = "Login logs",     action = loginLog},
-    {name = "Register logs",  action = registerLog},  
-}
 
 -- ==================================================================================
 -- This gives the developer full uncontrolled access to the cc:tweaked shell/terminal
@@ -55,6 +29,7 @@ local function fullAccess(username)
         term.setTextColor(colors.orange)
         write("WARNING: This gives you full uncotrolled access to the cc:tweaked terminal")
         term.setTextColor(colors.black)
+        term.setCursorBlink(false)
 
         while true do
 
@@ -91,13 +66,154 @@ local function fullAccess(username)
         end
     end
 end
+-- variables for drawScrollableContent()
+local scroll = 0
+local hScroll = 0
+local width, height = term.getSize()
+local topLines = 2
+local bottomLines = 2
+local scrollArea = height - topLines - bottomLines
+local maxLineLength = 0
+local lines = {}
+-- ===============================
+-- Draws content that can be moved
+-- ===============================
+local function drawScrollableContent()
+    local  startY = topLines + 1
 
--- ===================================================
--- This allows the developer to access all of the logs
--- ===================================================
+    for i = 1, scrollArea do 
+        term.setCursorPos(1 ,startY + i - 1)
+        term.clearLine()
+
+        local lineNumber = scroll + i
+
+        if lines[lineNumber] then
+            local visiblePart = lines[lineNumber]:sub(hScroll + 1, hScroll + width)
+            write(visiblePart)
+        end
+    end
+end
+
+-- =============================================
+-- Allows devs to view any log inside the system
+-- =============================================
 local function viewLogs(username)
+    --required variables
+    local dirPath = "/operatingSystem/logs"
+    local logTypesRaw = fs.list(dirPath)
+    local logTypes = {}
+
+    for _, log in ipairs(logTypesRaw) do 
+        local name = log:gsub("%.txt$", "")
+        table.insert(logTypes, name)
+    end
+
+    local chosenLog = selectionLib.selection(powerOptionsActions, logTypes, 1, 5, 42 ,18, "Press F1 to return back to main menu", username, "=== choose a type of log ===", 15, 3, true)
+    if chosenLog == false then 
+        return false
+    end
+
     term.clear()
-    selectionLib.selection(powerOptionsActions, logOptions, 1, 5, 42 ,18, "Press F1 to return back to main menu", username, "=== choose a type of log ===", 15, 3, true)
+    term.setCursorPos(1,1)
+    local logPath = dirPath.."/"..chosenLog..".txt"
+    scroll = 0 
+    hScroll = 0
+    lines = {}
+    maxLineLength = 0
+    logs.logger("dev", " opened ", " logs", chosenLog)
+
+    local file = fs.open(logPath, "r")
+    while true do 
+        local line = file.readLine()
+        if not line then break end
+        table.insert(lines, line)
+        if #line > maxLineLength then 
+            maxLineLength = #line
+        end
+    end
+    file.close()
+   
+    term.clear()
+    header.drawHeader(username)
+    header.drawClock()
+    navigation.helper("Press F1 to return", "Scrollwheel = up/down, arrows = left/right")
+    drawScrollableContent()
+    while true do
+        -- scrolling mechanism  
+        local event, param1 = os.pullEvent()
+
+        if event == "mouse_scroll" then
+            local direction = param1
+            local maxScroll = #lines - scrollArea
+
+            if direction == -1 and scroll > 0 then
+                scroll = scroll - 1
+            elseif direction == 1 and scroll < maxScroll then
+                scroll = scroll + 1
+            end
+            
+            drawScrollableContent()
+            
+        elseif event == "key" then 
+            if param1 == keys.left then 
+                if hScroll > 0 then 
+                    hScroll = hScroll - 1
+                    drawScrollableContent()
+                end
+
+            elseif param1 == keys.right then 
+                local maxHScroll = math.max(0, maxLineLength - width)
+                if hScroll < maxHScroll then 
+                    hScroll = hScroll + 1
+                    drawScrollableContent()
+                end
+
+            elseif param1 == keys.f1 then 
+                scroll = 0 
+                hScroll = 0
+                return false
+            end
+        end
+    end
+end
+
+-- ===============================================
+-- Allows devs to restore the settings of any user
+-- ===============================================
+local function restoreToDefaults(username)
+    -- required variables
+    local usersToReset = "operatingSystem/users/"
+    local usersList = fs.list(usersToReset)
+    local resetableUsers = {}
+ 
+
+    for _, user in ipairs(usersList) do 
+        table.insert(resetableUsers, user)
+    end
+
+    local targetUser = selectionLib.selection(powerOptionsActions, resetableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Choose an option ===", 15, 3, true)
+    if not targetUser then return end
+    
+    local settingsPath = "operatingSystem/users/"..targetUser.."/settings.json"
+
+    while true do 
+        messages.confirm("Reset settings for ", targetUser, "", 10, 8)
+
+        local event, param = os.pullEvent()
+        
+        if event == "key" then 
+            if param == keys.y or param == keys.z then 
+                local file = fs.open(settingsPath, "w")
+                file.write(textutils.serialize(defaultSettings))
+                file.close()
+                logs.logger("dev", " reset settings for ", targetUser)
+                messages.success(targetUser, "'s settings have been reset", 10,8)
+                return false
+            elseif param == keys.n then 
+                return false 
+            end
+        end
+    end
 end
 
 -- =====================================================
