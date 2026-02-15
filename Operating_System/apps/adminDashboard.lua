@@ -10,14 +10,13 @@ local messages = require("UI.messages")
 local powerLib = require("lib.power")
 local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
--- username
+
 local username = state.getUsername()
 
 -- =====================================================================
 -- Allows admins and devs to change other user's and their own passwords
 -- =====================================================================
 local function changeUserPassword(username)
-    -- required variables
     local usersDir = "operatingSystem/users/"
     local usersList = fs.list(usersDir)
     local targetUser = selectionLib.selection(powerOptionsActions, usersList, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to modify ===", 12, 3, true)
@@ -48,13 +47,13 @@ local function changeUserPassword(username)
     
     while true do 
         term.clear()
-        header.drawClock()
         header.drawHeader(username)
+        header.drawClock()
         term.setCursorPos(16,8)
         write("Enter new password: ")
         
         local newPass = read()
-        -- password checks
+
         if newPass == oldPass then 
             term.setCursorPos(14,10)
             term.setTextColor(colors.red)
@@ -79,8 +78,8 @@ local function changeUserPassword(username)
             f.close()
             logs.logger("admin"," changed ", targetUser, "'s password")
             term.clear()
-            header.drawClock()
             header.drawHeader(username)
+            header.drawClock()
             term.setCursorPos(18,10)
             term.setTextColor(colors.lime)
             write("Password updated")
@@ -95,7 +94,6 @@ end
 -- Allows admins and devs to delete other users apart from the last admin/dev
 -- ==========================================================================
 local function deleteUser(username)
-    -- required variables 
     local usersToDelete = "operatingSystem/users/"
     local usersList = fs.list(usersToDelete)
     local deletableUsers = {}
@@ -115,12 +113,10 @@ local function deleteUser(username)
     if not targetUser then return false end 
 
     while true do
-        -- confirmation loop
-        
         messages.confirm("Delete ",targetUser, "WARNING: This will delete all user's data")
         
         local event, param = os.pullEvent()
-        -- event pulling and data deletion
+        
         if event == "key" then 
             if param == keys.y or param == keys.z then 
                 fs.delete(usersToDelete..targetUser)
@@ -136,7 +132,6 @@ end
 -- Allows admins and devs to promote other users to admins
 -- =======================================================
 local function promoteToAdmin(username)
-    -- required variables
     local usersToPromote = "operatingSystem/users/"
     local usersList = fs.list(usersToPromote)
     local promotableUsers = {}
@@ -167,9 +162,8 @@ local function promoteToAdmin(username)
         sleep(2)
     else
         while true do 
-            -- conformation loop
             messages.confirm("promote ", targetUser,"WARNING: This will grant the user higher power!")
-            -- event pulling and data rewrite
+        
             local event, param = os.pullEvent()
             if event == "key" then 
                 if param == keys.y or param == keys.z then
@@ -181,7 +175,6 @@ local function promoteToAdmin(username)
                     file.write(textutils.serialize(meta))
                     file.close()
                     logs.logger("admin", " promoted ", targetUser, " to admin")
-                    --logs.dataChange2("admin", " Promoted ", targetUser, " to admin")
                     term.clear()
                     messages.success(targetUser, " has been promoted to admin", 10, 8)
                     return false end 
@@ -196,7 +189,6 @@ end
 -- Allows admins and devs to demote admins
 -- =======================================
 local function demoteAdmin(username)
-    -- required variables
     local usersToDemote = "operatingSystem/users/"
     local usersList = fs.list(usersToDemote)
     local demotableUsers = {}
@@ -238,26 +230,24 @@ local function demoteAdmin(username)
         sleep(2)
     else
         while true do
-            -- confirmation loop
             messages.confirm("Demote ", targetUser)
-        -- event pulling and data rewrite
-        local event, param = os.pullEvent()
+       
+            local event, param = os.pullEvent()
 
-        if event == "key" then 
-            if param == keys.y or param == keys.z then 
-                local meta = users.loadUserMeta(targetUser)
-                meta.admin = false
-                meta.role = "user"
-                local metaPath = usersToDemote..targetUser.."/meta.json"
-                local file = fs.open(metaPath, "w")
-                file.write(textutils.serialize(meta))
-                file.close()
-                logs.logger("admin", " demoted ", targetUser, " from admin to user")
-                --logs.dataChange2("admin", " demoted ", targetUser, " from admin to user")
-                messages.success(targetUser, " has been demoted", 16,8)
-                return false
-            elseif param == keys.n then 
-                return false end
+            if event == "key" then 
+                if param == keys.y or param == keys.z then 
+                    local meta = users.loadUserMeta(targetUser)
+                    meta.admin = false
+                    meta.role = "user"
+                    local metaPath = usersToDemote..targetUser.."/meta.json"
+                    local file = fs.open(metaPath, "w")
+                    file.write(textutils.serialize(meta))
+                    file.close()
+                    logs.logger("admin", " demoted ", targetUser, " from admin to user")
+                    messages.success(targetUser, " has been demoted", 16,8)
+                    return false
+                elseif param == keys.n then 
+                    return false end
             end
         end
     end
