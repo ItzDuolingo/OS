@@ -5,15 +5,13 @@ local settingsLib = require("lib.defaultSettings")
 local defaultSettings = settingsLib.defaultSettings()
 local username = state.getUsername()
 
-local path = "/operatingSystem/users/"..username.."/settings.json"
-
 local M = {}
 
 function M.loadSettings(username)
     if username == nil then 
         return defaultSettings 
     end
-
+    local path = "/operatingSystem/users/"..username.."/settings.json"
     if not fs.exists(path) then 
         local file = fs.open(path, "w")
         file.write(textutils.serialize(defaultSettings))
@@ -27,17 +25,18 @@ function M.loadSettings(username)
 end
 
 function M.restoreSettings(username)
+    local path = "/operatingSystem/users/"..username.."/settings.json"
     if not fs.exists(path) then return false, "file not found" end 
 
     local file = fs.open(path, "w")
     file.write(textutils.serialize(defaultSettings))
     file.close()
 end
--- themes to be used for changing theme
+-- options to be used for changing theme
 M.themes = {
-    {name = "black", data = {background = "black", text = "white"}},
-    {name = "ash", data = {background = "gray", text = "white"}},
-    {name = "light", data = {background = "lightGray", text = "black"}},
+    {name = "Dark", data = {background = "black", text = "white"}},
+    {name = "Ash", data = {background = "gray", text = "white"}},
+    {name = "Light", data = {background = "lightGray", text = "black"}},
 }
 
 return M
