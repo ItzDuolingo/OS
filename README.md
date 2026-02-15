@@ -7,6 +7,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - [Features](#features)
 - [Admin Dashboard](#admin-dashboard)
 - [Dev Tools](#dev-tools)
+- [Settings](#settings)
 - [Roadmap](#roadmap)
 - [Changelog](#changelog)
 - [Known Issues](#known-issues)
