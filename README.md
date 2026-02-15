@@ -45,9 +45,9 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 # Roadmap
 
-# In progress
+## In progress
 
-## Settings
+### Settings
 - Navigation preset
 - Clock (on/off)
 - Time format
