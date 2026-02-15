@@ -24,6 +24,8 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - UI Drawing and navigation
 - Multiple menus
 - Permission handling
+- Per user data
+- custom scrolling
   
 ### Admin Dashboard
 - User deletion
@@ -37,11 +39,20 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Ability to demote devs to users and promote users to devs
 - Ability to reset settings to defaults
 
+### Settings
+- Abilit to change theme
+
 # Roadmap
 
 ### In progress
-- Settings for desktop
-- refactor of selectionLib
+
+## Settings
+- Navigation preset
+- Clock (on/off)
+- Time format
+- Changing username
+- Changing password
+- Resetting to defaults
   
 ### Planned
 - App store for desktop
@@ -56,6 +67,13 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Some custom games that utilize turtles and rednet 
 
 ## Changelog
+
+### v1.3
+- Users can now choose between dark, ash and light theme
+- Devs can restore settings to defaults per user
+- Viewing logs now uses custom scrolling mechanism
+- Switching between main and power menu is now possible only with A/D, however going up/down still utilizes W/S 
+- Some comments were cleared since they were redundant 
 
 ### v1.2
 - Dev tools have been added
@@ -88,7 +106,6 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - When the read event is triggered during registration/login you can't use F1 to return, fix not found yet
 - "Guest" account has been temporarily removed and is not available in current versions
 - The clock won't update during login/register due to the read event being triggered
-- There is some issue while using A/D to switch between normal and power menu with the [example] highlight not being visible, fix not found yet
 - I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
 - This code is NOT made for monitors, it is only made to be used on the terminal for now tho i intend to introduce monitor support later in the future
 - Custom installation process is missing (no pastebin or wget) for now refer to the installation steps below
