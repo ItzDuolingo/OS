@@ -1,5 +1,5 @@
 package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. package.path
---required modules
+-- required modules
 local users = require("lib.users")
 local perms = require("lib.permissions")
 local state = require("lib.state")
@@ -13,7 +13,7 @@ local navigation = require("UI.navigationHelp")
 local powerLib = require("lib.power")
 local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
--- username
+
 local username = state.getUsername() 
 
 -- ==================================================================================
@@ -37,7 +37,7 @@ local function fullAccess(username)
 
             if event == "key" then 
                 if param == keys.y or param == keys.z then 
-                    -- this makes sure to capture only the "char" event, if it didnt it would start with "y" or "z" when the read event is triggered
+                    -- consume "char" event to prevent read() from capturing Y/Z input
                     os.pullEvent("char")
                     term.clear()
                     header.drawHeader(username)
@@ -75,9 +75,8 @@ local bottomLines = 2
 local scrollArea = height - topLines - bottomLines
 local maxLineLength = 0
 local lines = {}
--- ===============================
--- Draws content that can be moved
--- ===============================
+
+-- rendering scrollable content (horizontal and vertical)
 local function drawScrollableContent()
     local  startY = topLines + 1
 
@@ -98,11 +97,10 @@ end
 -- Allows devs to view any log inside the system
 -- =============================================
 local function viewLogs(username)
-    --required variables
-    local dirPath = "/operatingSystem/logs"
+    local dirPath = "/operatingSystem/logs/"
     local logTypesRaw = fs.list(dirPath)
     local logTypes = {}
-
+    -- getting rid of the .txt extension
     for _, log in ipairs(logTypesRaw) do 
         local name = log:gsub("%.txt$", "")
         table.insert(logTypes, name)
@@ -115,13 +113,13 @@ local function viewLogs(username)
 
     term.clear()
     term.setCursorPos(1,1)
-    local logPath = dirPath.."/"..chosenLog..".txt"
+    local logPath = dirPath..chosenLog..".txt"
     scroll = 0 
     hScroll = 0
     lines = {}
     maxLineLength = 0
-    logs.logger("dev", " opened ", " logs", chosenLog)
-
+    logs.logger("dev", " opened ", chosenLog, " logs")
+    -- load the selected log file and insert it into lines{} for rendering 
     local file = fs.open(logPath, "r")
     while true do 
         local line = file.readLine()
@@ -181,7 +179,6 @@ end
 -- Allows devs to restore the settings of any user
 -- ===============================================
 local function restoreToDefaults(username)
-    -- required variables
     local usersToReset = "operatingSystem/users/"
     local usersList = fs.list(usersToReset)
     local resetableUsers = {}
@@ -220,7 +217,6 @@ end
 -- Allows devs to promote admins and basic users to devs
 -- =====================================================
 local function promoteToDev(username)
-    -- required variables
     local usersToPromote = "operatingSystem/users/"
     local usersList = fs.list(usersToPromote)
     local promotableUsers = {}
@@ -240,12 +236,10 @@ local function promoteToDev(username)
         
         local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to promote ===", 10,3, true) 
         if not targetUser then return end
-
+    
         while true do 
-            -- confirmation loop
             messages.confirm("Promote ", targetUser, "WARNING: This grants the user higher power")
 
-            -- event pulling and data rewrite
             local event, param = os.pullEvent()
 
             if event == "key" then 
@@ -272,7 +266,6 @@ end
 -- Allows devs to demote devs to users
 -- ===================================
 local function demoteDev(username)
-    -- required variables
     local usersToDemote = "operatingSystem/users/"
     local usersList = fs.list(usersToDemote)
     local demotableUsers = {}
@@ -308,7 +301,6 @@ local function demoteDev(username)
 
     while true do
         messages.confirm("Demote ", targetUser)
-        -- event pulling and data rewrite
         local event, param = os.pullEvent()
 
         if event == "key" then if
