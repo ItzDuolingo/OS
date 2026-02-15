@@ -6,10 +6,11 @@ local M = {}
 -- it determines what and where it should log 
 -- logtype is the type of the log (for example "admin" is admins logs)
 -- action is what happened, a log in, a register, a user deletion, whatever you define
--- targetUser is the targetUser in the main code this just makes sure it writes the targetUser
+-- targetUser is whatever is defined as selectionLib for example "targetUser" or "chosenTheme"
 -- t1 and t2 are extra texts after if you ever need
+-- log is only for the viewLogs(), this logs which type of log the user opened
 --note: the file type is .txt
-function M.logger(logType, action, targetUser, t1, t2)
+function M.logger(logType, action, targetUser, t1, t2, log)
     if not logType then error("writeLog.lua: no logtype provided") end 
     if not action then error("writeLog.lua: no action provided") end 
 
@@ -23,6 +24,10 @@ function M.logger(logType, action, targetUser, t1, t2)
         line = line..targetUser
     end
     
+    if log then 
+        line = line..log
+    end
+
     if t1 and t2 then 
         line = line..t1..t2
     elseif t1 then 
