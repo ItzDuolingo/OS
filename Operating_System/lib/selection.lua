@@ -1,172 +1,179 @@
 -- required modules
 local navigation = require("UI.navigationHelp")
 local header = require("UI.header")
+local state = require("lib.state")
+local settings = require("lib.settingsManager")
+local settingsLib = require("lib.defaultSettings")
+local defaultSettings = settingsLib.defaultSettings()
 
 local M = {}
--- =============================================================================================================================
--- this is one of the more complicated functions, basically a lib for UI handling, appologies if its hard to read and understand
--- =============================================================================================================================
-function M.selection(powerOptionsActions, optionsActions, X1, Y1, X2, Y2, t1, t2, t3, tPosX, tPosY, canExit)
-    -- following code bellow that contains "error" is for error handling for the arguments of the function
-    if type(powerOptionsActions) ~= "table" then
-        error("selection.lua: powerOptionsActions must be a table")
+-- changing a table with no action value to a table with action value  (for example fs.list())
+local function list(optionsActions)
+    local list = {}
+
+    for _, opt in ipairs(optionsActions) do 
+        table.insert(list, {
+            name = opt,
+            value = opt
+        })
+    end
+    
+    return list
+end
+
+-- ============================================================================================================
+-- This function is the core UI handler, it draws the whole UI, decides what was selected and sends that trough
+-- ============================================================================================================
+function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY, navigationText, username, title, tPosX, tPosY, canExit)
+    if type(powerOptionsActions) ~= "table" then 
+        error("SelectionLib: PowerLib isn't a table!")
     end
 
-    if type(optionsActions) ~= "table" then
-        error("selection.lua: optionsActions must be a table")
+    if type(optionsActions) ~= "table" then 
+        error("SelectionLib: OptionsActions isn't a table or wasn't normalized!")
+    end 
+
+    if not X1 or not Y1 then
+        error("SelectionLib: OptionsActions table position is missing!")
     end
 
-    if not X1 or not Y1 or not X2 or not Y2 then
-        error("selection.lua: missing menu coordinates")
+    if not powerY or not powerX then 
+        error("SelectionLib: Power table position is missing!")
     end
 
-    if not t1 then
-        error("selection.lua: navigation text (t1) missing")
+    if not navigation then 
+        error("SelectionLib: Navigation text can't be nil!")
     end
 
-    if t2 ~= nil and type(t2) ~= "string" then
-        error("selection.lua: username must be string or nil")
+    if username ~= nil and type(username) ~= "string" then
+        error("SelectionLib: Username must be nil or a string!")
     end
 
-    if not t3 then
-        error("selection.lua: title text missing")
+    if not title then 
+        error("SelectionLib: Title text is missing!")
     end
 
-    if not tPosX or not tPosY then
-        error("selection.lua: title position missing")
+    if not tPosX or not tPosY then 
+        error("SelectionLib: check if you aren't missing the titple positions")
     end
 
-    -- detect menu mode
-    local mode = "actions"
+    if canExit == nil then 
+        error("SelectionLib: 'canExit' isn't a boolean value")
+    end
 
     if type(optionsActions[1]) == "string" then
-        mode = "list"
+        optionsActions = list(optionsActions)
     end
 
-    -- code below should take the optionsActions table and turn it into the proper variant it needs to be able to work 
-    -- this is used in admin dashboard for example, where "optionsActions" table is equal to "promotableUsers" for example 
-    -- since "promotableUsers" isnt a traditional optionsActions table, the code below takes that variant of a table and uses that to work with the rest of the code
-    local options = {}
-
-    if mode == "actions" then
-        for _, opt in ipairs(optionsActions) do
-            if type(opt) ~= "table" or type(opt.name) ~= "string" or type(opt.action) ~= "function" then
-                error("selection.lua: invalid action entry")
-            end
-            table.insert(options, opt)
-        end
-    else
-        for _, value in ipairs(optionsActions) do
-            if type(value) ~= "string" then
-                error("selection.lua: list mode expects string values")
-            end
-            table.insert(options, {
-                name = value,
-                value = value
-            })
-        end
-    end
-
-    -- state
+    local items = optionsActions
+    local path = "/operatingSystem/logs/"
     local activeMenu = "main"
-    local mainSelected = 1
+    local mainSelected = 1      
     local powerSelected = 1
-
-    local startX, startY = X1, Y1
-    local startX2, startY2 = X2, Y2
-
+    local scroll = 0        
+    local topLines = Y1
+    local bottomLines = 4
+    local startX = X1
+    local width, height = term.getSize()     
+    local visible = height - topLines - bottomLines
     local clockTimer = os.startTimer(1)
+    term.setCursorBlink(false)
 
-    -- main loop
     while true do
-        term.setBackgroundColor(colors.lightGray)
-        term.setTextColor(colors.black)
+        local theme = require("lib.themeManager")
+        term.setBackgroundColor(theme.current.background)
+        term.setTextColor(theme.current.text)
         term.clear()
-
-        navigation.helper(t1)
-        header.drawClock()
-        header.drawHeader(t2)
-
-        -- title
         term.setCursorPos(tPosX, tPosY)
-        write(t3)
-
-        -- main menu
-        for i, opt in ipairs(options) do
-            term.setCursorPos(startX, startY + i - 1)
+        write(title)
+        header.drawHeader(username)
+        header.drawClock()
+        navigation.helper(navigationText) 
+        -- UI drawing and scrolling math
+        for i = scroll + 1, math.min(scroll + visible, #items) do 
+            local Ypos = topLines +  (i - scroll)
+            term.setCursorPos(startX, Ypos)
             if activeMenu == "main" and i == mainSelected then
-                write("[" .. opt.name .. "]")
+                write("["..items[i].name.."]")
             else
-                write(" " .. opt.name .. " ")
+                write(" "..items[i].name.." ")
             end
         end
 
-        -- power menu
-        for i, opt in ipairs(powerOptionsActions) do
-            term.setCursorPos(startX2, startY2 + i - 1)
-            if activeMenu == "power" and i == powerSelected then
-                write("[" .. opt.name .. "]")
-            else
-                write(" " .. opt.name .. " ")
+        for i, opt in ipairs(powerOptionsActions) do 
+                term.setCursorPos(powerX, powerY + i - 1)
+                if activeMenu == "power" and i == powerSelected then 
+                    write("["..opt.name.."]")
+                else
+                    write(" "..opt.name.." ")
             end
         end
 
-        -- input handling
         local event, param = os.pullEvent()
-
+        -- updating the variables so that scrolling is possible
         if event == "key" then
-            if param == keys.a or param == keys.d then
-                activeMenu = (activeMenu == "main") and "power" or "main"
-
-            elseif param == keys.w then
-                if activeMenu == "main" then
-                    mainSelected = mainSelected - 1
-                    if mainSelected < 1 then
-                        activeMenu = "power"
-                        powerSelected = #powerOptionsActions
-                    end
-                else
+            if param == keys.w then
+                if activeMenu == "main" then 
+                    mainSelected = mainSelected - 1 
+                    if mainSelected < 1 then mainSelected = #items end
+                
+                elseif activeMenu == "power" then 
                     powerSelected = powerSelected - 1
-                    if powerSelected < 1 then
-                        activeMenu = "main"
-                        mainSelected = #options
-                    end
+                    if powerSelected < 1 then powerSelected = #powerOptionsActions end 
                 end
 
-            elseif param == keys.s then
+            elseif param == keys.s then 
                 if activeMenu == "main" then
-                    mainSelected = mainSelected + 1
-                    if mainSelected > #options then
-                        activeMenu = "power"
-                        powerSelected = 1
-                    end
-                else
+                    mainSelected = mainSelected + 1 
+                    if mainSelected > #items then mainSelected = 1 end
+                
+                elseif activeMenu == "power" then 
                     powerSelected = powerSelected + 1
-                    if powerSelected > #powerOptionsActions then
-                        activeMenu = "main"
-                        mainSelected = 1
-                    end
+                    if powerSelected > #powerOptionsActions then powerSelected = 1 end
                 end
 
-            elseif param == keys.f1 then
-                if canExit == true then -- "canExit" regulates if the user can use F1 to return to a previous menu, the purpoose of this is to prevent the user from using F1 if it would exit the whole code
-                return nil
+            elseif param == keys.d then 
+                if activeMenu == "main" then 
+                    activeMenu = "power"
+                elseif activeMenu == "power" then
+                    activeMenu = "main"
                 end
 
+            elseif param == keys.a then 
+                if activeMenu == "main" then 
+                    activeMenu = "power"
+                elseif activeMenu == "power" then 
+                    activeMenu = "main"
+                end
+            
             elseif param == keys.enter then
                 if activeMenu == "main" then
-                    if mode == "actions" then
-                        local result = options[mainSelected].action(t2)
-                        if result == true then return true end
+                    local action = optionsActions[mainSelected].action
+                    
+                    if type(action) == "function" then 
+                        local result = optionsActions[mainSelected].action(username)
+                        if result == true then 
+                            return optionsActions[mainSelected].value or optionsActions[mainSelected].name
+                        end
                     else
-                        return options[mainSelected].value
+                        return optionsActions[mainSelected].value or optionsActions[mainSelected].name 
                     end
-                else
-                    powerOptionsActions[powerSelected].action(t2)
+                else 
+                    local result = powerOptionsActions[powerSelected].action(username)
                 end
+            
+            elseif param == keys.f1 then 
+                if canExit == true then
+                    return false end    
+                end
+
+            if mainSelected < scroll + 1 then
+                scroll = mainSelected - 1
+            elseif mainSelected > scroll + visible then
+                scroll = mainSelected - visible
             end
 
-        elseif event == "timer" and param == clockTimer then
+        elseif event == "timer" and param == clockTimer then 
             header.drawClock()
             clockTimer = os.startTimer(1)
         end
