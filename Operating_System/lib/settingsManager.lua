@@ -18,12 +18,6 @@ M.clockState = {
      {name = "Toggle"}, 
 }
 
-M.formatOpt = {
-    {name = "DD/MM/YYYY"},
-    {name = "MM/DD/YYYY"},
-    {name = "YYYY/MM/DD"},
-}
-
 function M.loadSettings(username)
     local settings 
 
@@ -84,19 +78,6 @@ function M.toggleClock(username)
 
     M.current.clockEnabled = settings.clock.enabled
     return M.current.clockEnabled
-end
-
-function M.applyTimeFormat(username, format)
-    local settings = M.loadSettings(username)
-    local username = state.getUsername()
-
-    settings.date.format = format.name
-    M.current.timeFormat = format.name
-
-    local path = "/operatingSystem/users/"..username.."/settings.json"
-    local file = fs.open(path, "w")
-    file.write(textutils.serialize(settings))
-    file.close()
 end
 
 -- options to be used for changing theme
