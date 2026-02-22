@@ -42,6 +42,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ### Settings
 - Abilit to change theme
+- ability to toggle clock
 
 # Roadmap
 
@@ -68,6 +69,9 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Some custom games that utilize turtles and rednet 
 
 ## Changelog
+
+### v1.4
+- users can now toggle clock to false or true 
 
 ### v1.3
 - Users can now choose between dark, ash and light theme
