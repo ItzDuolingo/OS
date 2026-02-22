@@ -11,7 +11,6 @@ M.current = {
     background = colors.lightGray,
     text = colors.black,
     clockEnabled = true,
-    timeFormat = "DD/MM/YYYY",
 }
 
 M.clockState = {
