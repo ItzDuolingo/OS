@@ -11,23 +11,9 @@ local navigation = require("UI.navigationHelp")
 local powerLib = require("lib.power")
 local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
-local themeManager = require("lib.themeManager")
 
 local username = state.getUsername() 
 local settingsPath = "/operatingSystem/users/"..username.."/settings.json"
-
-local function applyTheme(username, theme) 
-    local setSettings = settings.loadSettings(username)
-
-    setSettings.ui.background = theme.background
-    setSettings.ui.textColor.ui = theme.text
-
-    local file = fs.open(settingsPath, "w")
-    file.write(textutils.serialize(setSettings))
-    file.close()
-
-    return true 
-end
 
 local function setTheme(username)
     local themeOptions = {}
@@ -36,8 +22,16 @@ local function setTheme(username)
         table.insert(themeOptions, {
             name = theme.name,
             action = function()
-                themeManager.apply(theme.data)
-                return applyTheme(username, theme.data)
+                local current = settings.loadSettings(username)
+                current.ui.background = theme.data.background
+                current.ui.textColor.ui = theme.data.text
+
+                local file = fs.open(settingsPath, "w")
+                file.write(textutils.serialize(current))
+                file.close()
+
+                settings.apply(theme.data)
+                return true 
             end
         })
     end
@@ -52,8 +46,37 @@ local function setTheme(username)
 end
 
 
+local function toggleClock(username)
+    local clockOptionsActions = {}
+    settings.loadSettings(username)
+
+    for _, clockTog in ipairs(settings.clockState) do 
+        table.insert(clockOptionsActions, {
+            name = clockTog.name,
+            action = function() 
+                settings.toggleClock(username) 
+                return true 
+            end
+        })
+    end
+    
+    local chosen = selectionLib.selection(powerOptionsActions, clockOptionsActions, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Choose an option ===", 15, 3, true)
+    
+    if chosen == false then return false end 
+
+    term.clear()
+    header.drawHeader(username)
+    header.drawClock()
+    term.setCursorPos(16, 9)
+    term.setTextColor(colors.lime)
+    write("Clock toggled to "..tostring(settings.current.clockEnabled))
+    logs.logger("settings", " toggled ", " clock to ", tostring(settings.current.clockEnabled))
+    sleep(3)
+end
+
 local optionsActions = {
     {name = "Theme", action = setTheme},
+    {name = "Clock (on/off)", action = toggleClock},
 }
 
 selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "Press F1 to return back to desktop", username, " === Choose an option ===", 15, 3, true)
