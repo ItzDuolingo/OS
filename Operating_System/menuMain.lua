@@ -1,14 +1,19 @@
--- required modules
+--required modules
 local users = require("lib.users")
-local appsLib = require("lib.appsData")
+local perms = require("lib.permissions")
+local state = require("lib.state")
 local logs = require("lib.writeLog")
-local apps = appsLib.defaultApps()
+local header = require("UI.header")
+local messages = require("UI.messages")
 local navigation = require("UI.navigationHelp")
 local powerLib = require("lib.power")
-local state = require("lib.state")
-local powerOptionsActions = powerLib.powerOptionsActions
 local selectionLib = require("lib.selection")
-local header = require("UI.header")
+local powerOptionsActions = powerLib.powerOptionsActions
+local settings = require("lib.settingsManager")
+local settingsLib = require("lib.defaultSettings")
+local defaultSettings = settingsLib.defaultSettings()
+
+state.setUsername()
 
 -- =======================================
 -- Draws the boxes for pass and name input
@@ -63,7 +68,7 @@ local function register()
         term.setCursorPos(13,7)
         term.setTextColor(colors.white)
         local username = read()
-        state.setUsername(username)
+        --state.setUsername(username)
         
         -- collecting password input inside boxes 
         term.setCursorPos(13,10)
@@ -75,29 +80,15 @@ local function register()
         local appsPath = userPath .. "/apps.json"
         local metaPath = userPath .. "/meta.json"
         if username == "admin" or username == "admins" or username == "dev" or username == "developer" or username == "developers" or username == "devs" or username == "guest" then 
-            term.setCursorPos(13,12)
-            term.setTextColor(colors.red)
-            write("Invalid input")
-            sleep(2)
-
+            messages.errorPN(nil, 17, 12, "Invalid username")
         elseif #username < 3 then 
-            term.setCursorPos(5,12)
-            term.setTextColor(colors.red)
-            write("Username must be at least 3 characters long!")
-            sleep(2)
-
+            messages.errorPN(nil, 5, 12, "Username must be at least 3 characters long!")
         elseif #pass < 5 then 
-            term.setCursorPos(5,12)
-            term.setTextColor(colors.red)
-            write("Password must be at least 5 characters long!")
-            sleep(2)
-
+            messages.errorPN(nil, 5, 12, "Password must be at least 5 characters long!")
         elseif fs.exists(userPath) then
-            term.setCursorPos(13,12)
-            term.setTextColor(colors.red)
-            write("This account already exists!")
-            sleep(2)
+            messages.errorPN(nil, 13, 12, "This account already exists!")
         else 
+            settings.restoreSettings(username)
             local meta = users.createUserMeta(username)
             fs.makeDir(userPath)
             local f1 = fs.open(passwordPath, "w")
@@ -111,10 +102,11 @@ local function register()
             local f3 = fs.open(metaPath, "w")
             f3.write(textutils.serialize(meta))
             f3.close()
-            logs.logger("register", " registered")
+
+            logs.logger("register", " registered", "", "", "", "",username)
 
             term.setCursorPos(13,12)
-            term.setTextColor(colors.green)
+            term.setTextColor(colors.lime)
             write("Account created successfuly")
             sleep(2)
             return false 
@@ -163,21 +155,18 @@ local function login()
         term.setCursorPos(13,7)
         term.setTextColor(colors.white)
         local username = read()
-        state.setUsername(username)
         
 
         -- collecting password input inside box
         term.setCursorPos(13,10)
         local pass = read("*")
 
-
         -- neccessary path for this function
         local path = "operatingSystem/users/" .. username.."/password.txt"
   
         --[[if username or password is wrong or account doesnt exist give the user a error message
             if account exists, name and password is correct start loading the system, run
-            desktop.lua and pass along username argument and return true so the while true do loop in 
-            mainMenu() breaks
+            desktop.lua
         ]]
         if not fs.exists(path) then
             term.setTextColor(colors.red)
@@ -188,7 +177,6 @@ local function login()
             local file = fs.open(path, "r")
             local stored = file.readAll()
             file.close()
-            logs.logger("login", " logged in")
         
             if stored == pass then
                 term.setBackgroundColor(colors.lightGray)
@@ -202,9 +190,11 @@ local function login()
                 end
                 term.clear()
                 term.setCursorPos(20,9)
+                state.setUsername(username)
                 print("Welcome, " ..username)
                 sleep(1)
-                shell.run("desktop.lua")--, username
+                logs.logger("login", " logged in")
+                shell.run("desktop.lua")
                 return true 
             else
                 term.setTextColor(colors.red)
@@ -228,4 +218,4 @@ local optionsActions = {
 -- ==========================================
 -- Start of code - refer to the selection.lua
 -- ==========================================
-selectionLib.selection(powerOptionsActions, optionsActions, 22, 6, 42 ,18,"", nil, "=== Choose an option ===",16, 3, false )
+selectionLib.selection(powerOptionsActions, optionsActions, 22, 6, 42 ,18,"", "=== Choose an option ===",16, 3, false)
