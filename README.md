@@ -70,7 +70,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ## Changelog
 
-### V1.5 
+### v1.5 
 - Users can now change their date format (e.g: DD/MM/YYYY)
 - Users can now change with which keys they navigate the menu (e.g: WSAD to move forward, backward, left and right and F1 to return to previous menu)
 - Users can now reset their settings to default
