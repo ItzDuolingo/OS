@@ -14,8 +14,6 @@ local powerLib = require("lib.power")
 local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
 
-local username = state.getUsername() 
-
 -- ==================================================================================
 -- This gives the developer full uncontrolled access to the cc:tweaked shell/terminal
 -- ==================================================================================
@@ -70,8 +68,8 @@ end
 local scroll = 0
 local hScroll = 0
 local width, height = term.getSize()
-local topLines = 2
-local bottomLines = 2
+local topLines = 3
+local bottomLines = 3
 local scrollArea = height - topLines - bottomLines
 local maxLineLength = 0
 local lines = {}
@@ -106,7 +104,7 @@ local function viewLogs(username)
         table.insert(logTypes, name)
     end
 
-    local chosenLog = selectionLib.selection(powerOptionsActions, logTypes, 1, 5, 42 ,18, "Press F1 to return back to main menu", username, "=== choose a type of log ===", 15, 3, true)
+    local chosenLog = selectionLib.selection(powerOptionsActions, logTypes, 1, 5, 42 ,18, "main menu", "=== choose a type of log ===", 15, 3, true)
     if chosenLog == false then 
         return false
     end
@@ -188,23 +186,19 @@ local function restoreToDefaults(username)
         table.insert(resetableUsers, user)
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, resetableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Choose an option ===", 15, 3, true)
+    local targetUser = selectionLib.selection(powerOptionsActions, resetableUsers, 1, 5, 42, 18, "main menu", "=== Choose an option ===", 15, 3, true)
     if not targetUser then return end
-    
-    local settingsPath = "operatingSystem/users/"..targetUser.."/settings.json"
 
     while true do 
-        messages.confirm("Reset settings for ", targetUser, "", 10, 8)
+        messages.confirm("Reset settings for ", targetUser, "", 10, 9)
 
         local event, param = os.pullEvent()
         
         if event == "key" then 
-            if param == keys.y or param == keys.z then 
-                local file = fs.open(settingsPath, "w")
-                file.write(textutils.serialize(defaultSettings))
-                file.close()
+            if param == keys.y or param == keys.z then
+                settings.restoreSettings(targetUser) 
                 logs.logger("dev", " reset settings for ", targetUser)
-                messages.success(targetUser, "'s settings have been reset", 10,8)
+                messages.success(targetUser, "'s settings have been reset", 10,9)
                 return false
             elseif param == keys.n then 
                 return false 
@@ -221,11 +215,13 @@ local function promoteToDev(username)
     local usersList = fs.list(usersToPromote)
     local promotableUsers = {}
     -- perms check
-    for _, user in ipairs (usersList) do 
+    for _, user in ipairs(usersList) do 
         local targetMeta = users.loadUserMeta(user)
         local ok, reason = perms.canModifyUser(username, user)
-        if ok and targetMeta and targetMeta.role == "user" or targetMeta.role == "admin" then
-            table.insert(promotableUsers, user)
+        if ok and targetMeta then 
+            if targetMeta.role == "user" or targetMeta.role == "admin" then
+                table.insert(promotableUsers, user)
+            end
         end
     end
         -- kicking back to main menu if no users to promote
@@ -234,7 +230,7 @@ local function promoteToDev(username)
             return false
         end
         
-        local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to promote ===", 10,3, true) 
+        local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10,3, true) 
         if not targetUser then return end
     
         while true do 
@@ -253,7 +249,7 @@ local function promoteToDev(username)
                     file.write(textutils.serialize(meta))
                     file.close()
                     logs.logger("dev", " promoted ", targetUser, " to developer")
-                    messages.success(targetUser, " has been promoted to developer", 5, 8)
+                    messages.success(targetUser, " has been promoted to developer", 5, 9)
                     return
                 elseif param == keys.n then 
                     return false
@@ -284,7 +280,7 @@ local function demoteDev(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, demotableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to demote ===", 10, 3, true )
+    local targetUser = selectionLib.selection(powerOptionsActions, demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===", 10, 3, true )
     if not targetUser then return false end
     -- disallow currently logged in user to demote himself
     if targetUser == username then 
@@ -300,7 +296,7 @@ local function demoteDev(username)
     end 
 
     while true do
-        messages.confirm("Demote ", targetUser)
+        messages.confirm("Demote ", targetUser, "",16, 9)
         local event, param = os.pullEvent()
 
         if event == "key" then if
@@ -314,7 +310,7 @@ local function demoteDev(username)
                 file.write(textutils.serialize(meta))
                 file.close()
                 logs.logger("dev", " demoted ", targetUser, " from developer to user")
-                messages.success(targetUser, " has been demoted", 16, 8)
+                messages.success(targetUser, " has been demoted", 16, 9)
                 return
             elseif param == keys.n then 
                 return false end
@@ -330,4 +326,4 @@ local optionsActions = {
     {name = "Demote developer to admin or user", action = demoteDev },
 }
 
-selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "Press F1 to return back to desktop", username, "=== Choose an option ===", 15, 3, true)
+selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "desktop", "=== Choose an option ===", 15, 3, true)
