@@ -11,15 +11,23 @@ function M.defaultSettings()
         },
 
         clock = {
-            enabled =  true
+            enabled = true
+        },
+
+        date = {
+            format = "DD/MM/YYYY"
         },
 
         navigation = {
-            move = "wsad",
-            back = "f1"
+            move = {
+                forward = "W",
+                backward = "S",
+                left = "A",
+                right = "D",
+            },
+            back = "F1"
         },
     }
 end
-
 
 return M
