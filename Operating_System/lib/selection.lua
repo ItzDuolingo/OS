@@ -24,7 +24,7 @@ end
 -- ============================================================================================================
 -- This function is the core UI handler, it draws the whole UI, decides what was selected and sends that trough
 -- ============================================================================================================
-function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY, navigationText, username, title, tPosX, tPosY, canExit)
+function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY, navigationTextType, title, tPosX, tPosY, canExit)
     if type(powerOptionsActions) ~= "table" then 
         error("SelectionLib: PowerLib isn't a table!")
     end
@@ -65,7 +65,7 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
         optionsActions = list(optionsActions)
     end
 
-    local items = optionsActions
+    local items = optionsActions   --- <- REMOVE ITEMS AND TURN ITEMS INTO optionsActions!
     local path = "/operatingSystem/logs/"
     local activeMenu = "main"
     local mainSelected = 1      
@@ -76,18 +76,28 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
     local startX = X1
     local width, height = term.getSize()     
     local visible = height - topLines - bottomLines
+   
     local clockTimer = os.startTimer(1)
     term.setCursorBlink(false)
 
     while true do
-        local theme = require("lib.themeManager")
-        term.setBackgroundColor(theme.current.background)
-        term.setTextColor(theme.current.text)
+        local username = state.getUsername()
+        local getSettings = settings.loadSettings(username)
+        local backKeyString = settings.current.returnKey
+        local backKeyCode = keys[string.lower(settings.current.returnKey)]
+        local navigationText = "Press "..backKeyString.." to return back to "..navigationTextType
+        if navigationTextType == "" then 
+            navigationText = ""
+        end 
+        local navigationPreset = settings.current.navigationPreset
+        settings.loadSettings(username)
+        term.setBackgroundColor(settings.current.background or colors.lightGray)
+        term.setTextColor(settings.current.text or colors.black)
         term.clear()
-        term.setCursorPos(tPosX, tPosY)
-        write(title)
         header.drawHeader(username)
         header.drawClock()
+        term.setCursorPos(tPosX, tPosY)
+        write(title)
         navigation.helper(navigationText) 
         -- UI drawing and scrolling math
         for i = scroll + 1, math.min(scroll + visible, #items) do 
@@ -110,9 +120,9 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
         end
 
         local event, param = os.pullEvent()
-        -- updating the variables so that scrolling is possible
+        -- updating the variables so that scrolling is possible and menu management
         if event == "key" then
-            if param == keys.w then
+            if param == keys[string.lower(getSettings.navigation.move.forward)] then
                 if activeMenu == "main" then 
                     mainSelected = mainSelected - 1 
                     if mainSelected < 1 then mainSelected = #items end
@@ -122,7 +132,7 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
                     if powerSelected < 1 then powerSelected = #powerOptionsActions end 
                 end
 
-            elseif param == keys.s then 
+            elseif param == keys[string.lower(getSettings.navigation.move.backward)] then 
                 if activeMenu == "main" then
                     mainSelected = mainSelected + 1 
                     if mainSelected > #items then mainSelected = 1 end
@@ -132,14 +142,14 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
                     if powerSelected > #powerOptionsActions then powerSelected = 1 end
                 end
 
-            elseif param == keys.d then 
+            elseif param == keys[string.lower(getSettings.navigation.move.left)] then 
                 if activeMenu == "main" then 
                     activeMenu = "power"
                 elseif activeMenu == "power" then
                     activeMenu = "main"
                 end
 
-            elseif param == keys.a then 
+            elseif param == keys[string.lower(getSettings.navigation.move.right)] then 
                 if activeMenu == "main" then 
                     activeMenu = "power"
                 elseif activeMenu == "power" then 
@@ -162,7 +172,7 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
                     local result = powerOptionsActions[powerSelected].action(username)
                 end
             
-            elseif param == keys.f1 then 
+            elseif param == backKeyCode then 
                 if canExit == true then
                     return false end    
                 end
