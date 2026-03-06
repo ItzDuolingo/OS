@@ -21,6 +21,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - File I/O
 - Admin dashboard
 - Dev tools
+- Settings
 - Keyboard input (UI Navigation)
 - UI Drawing and navigation
 - Multiple menus
@@ -41,20 +42,19 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Ability to reset settings to defaults
 
 ### Settings
-- Abilit to change theme
-- ability to toggle clock
+- Ability to change theme
+- Ability to toggle clock
+- Ability to change date format
+- Ability to change with which keys navigation throughout the menu is done
+- Ability to reset settings to default settings
+- Ability to change password
+- Ability to change username
 
 # Roadmap
 
 ## In progress
 
-### Settings
-- Navigation preset
-- Clock (on/off)
-- Time format
-- Changing username
-- Changing password
-- Resetting to defaults
+- App store
   
 ### Planned
 - App store for desktop
@@ -70,8 +70,15 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ## Changelog
 
+### V1.5 
+- Users can now change their date format (e.g: DD/MM/YYYY)
+- Users can now change with which keys they navigate the menu (e.g: WSAD to move forward, backward, left and right and F1 to return to previous menu)
+- Users can now reset their settings to default
+- Users can now change their password
+- Users can now change their username
+
 ### v1.4
-- users can now toggle clock to false or true 
+- Users can now toggle clock to false or true 
 
 ### v1.3
 - Users can now choose between dark, ash and light theme
