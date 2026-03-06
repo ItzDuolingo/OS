@@ -10,13 +10,16 @@ local M = {}
 -- t1 and t2 are extra texts after if you ever need
 -- log is only for the viewLogs(), this logs which type of log the user opened
 --note: the file type is .txt
-function M.logger(logType, action, targetUser, t1, t2, log)
+function M.logger(logType, action, targetUser, t1, t2, log, username)
     if not logType then error("writeLog.lua: no logtype provided") end 
     if not action then error("writeLog.lua: no action provided") end 
 
     local logsPath = "operatingSystem/logs/"..logType..".txt"
     local time = os.date("%Y-%m-%d %H:%M:%S")
-    local username = state.getUsername()
+    
+    if not username then 
+        username = state.getUsername()
+    end
 
     local line = "["..time.."] "..username..action
 
