@@ -3,6 +3,7 @@ package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. 
 local users = require("lib.users")
 local perms = require("lib.permissions")
 local logs = require("lib.writeLog")
+local settings = require("lib.settingsManager")
 local state = require("lib.state")
 local header = require("UI.header")
 local navigation = require("UI.navigationHelp")
@@ -11,7 +12,6 @@ local powerLib = require("lib.power")
 local selectionLib = require("lib.selection")
 local powerOptionsActions = powerLib.powerOptionsActions
 
-local username = state.getUsername()
 
 -- =====================================================================
 -- Allows admins and devs to change other user's and their own passwords
@@ -19,7 +19,7 @@ local username = state.getUsername()
 local function changeUserPassword(username)
     local usersDir = "operatingSystem/users/"
     local usersList = fs.list(usersDir)
-    local targetUser = selectionLib.selection(powerOptionsActions, usersList, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to modify ===", 12, 3, true)
+    local targetUser = selectionLib.selection(powerOptionsActions, usersList, 1, 5, 42, 18, "main menu", "=== Select a user to modify ===", 12, 3, true)
     
     if not targetUser then return false end 
 
@@ -49,29 +49,15 @@ local function changeUserPassword(username)
         term.clear()
         header.drawHeader(username)
         header.drawClock()
-        term.setCursorPos(16,8)
+        term.setCursorPos(16,9)
         write("Enter new password: ")
         
-        local newPass = read()
+        local newPass = read("*")
 
-        if newPass == oldPass then 
-            term.setCursorPos(14,10)
-            term.setTextColor(colors.red)
-            write("New password must be different")
-            term.setTextColor(colors.black)
-            sleep(2)
-        elseif newPass == "" then 
-            term.setCursorPos(14,10)
-            term.setTextColor(colors.red)
-            write("Password cannot be empty")
-            term.setTextColor(colors.black)
-            sleep(2)
+        if newPass == oldPass then
+            messages.errorPN(username, 2, 11, "New password must be different from old password") 
         elseif #newPass < 5 then 
-            term.setCursorPos(5,10)
-            term.setTextColor(colors.red)
-            write("Password must be at least 5 characters long")
-            term.setTextColor(colors.black)
-            sleep(2)
+             messages.errorPN(Username, 7, 11, "Password must be at least 5 characters")
         else 
             local f = fs.open(passwordPath, "w")
             f.write(newPass)
@@ -109,7 +95,7 @@ local function deleteUser(username)
         messages.noUsers("No users to delete")
         return false
     end
-    local targetUser = selectionLib.selection(powerOptionsActions, deletableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username, "=== Select a user to delete ===", 10, 3, true) 
+    local targetUser = selectionLib.selection(powerOptionsActions, deletableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to delete ===", 10, 3, true) 
     if not targetUser then return false end 
 
     while true do
@@ -121,7 +107,7 @@ local function deleteUser(username)
             if param == keys.y or param == keys.z then 
                 fs.delete(usersToDelete..targetUser)
                 logs.logger("admin", " deleted ", targetUser)
-                messages.success(targetUser, " has been successfully deleted", 10, 8)
+                messages.success(targetUser, " has been successfully deleted", 10, 9)
                 return false
             elseif param == keys.n then return false end 
         end        
@@ -149,7 +135,7 @@ local function promoteToAdmin(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers,1, 5, 42, 18, "Press F1 to return back to the main menu", username,"=== Select a user to promote ===", 10, 3, true)
+    local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers,1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10, 3, true)
     if not targetUser then return false end
 
     -- more perm checks 
@@ -176,7 +162,7 @@ local function promoteToAdmin(username)
                     file.close()
                     logs.logger("admin", " promoted ", targetUser, " to admin")
                     term.clear()
-                    messages.success(targetUser, " has been promoted to admin", 10, 8)
+                    messages.success(targetUser, " has been promoted to admin", 10, 9)
                     return false end 
                 elseif param == keys.n then 
                     return false 
@@ -206,7 +192,7 @@ local function demoteAdmin(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, demotableUsers, 1, 5, 42, 18, "Press F1 to return back to main menu", username,"=== Select a user to demote ===" ,10, 3, true )
+    local targetUser = selectionLib.selection(powerOptionsActions, demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===" ,10, 3, true )
     if not targetUser then return false end
     -- disallow currently logged in user to demote himself
     if targetUser == username then 
@@ -230,7 +216,7 @@ local function demoteAdmin(username)
         sleep(2)
     else
         while true do
-            messages.confirm("Demote ", targetUser)
+            messages.confirm("Demote ", targetUser, "", 16, 9)
        
             local event, param = os.pullEvent()
 
@@ -244,7 +230,7 @@ local function demoteAdmin(username)
                     file.write(textutils.serialize(meta))
                     file.close()
                     logs.logger("admin", " demoted ", targetUser, " from admin to user")
-                    messages.success(targetUser, " has been demoted", 16,8)
+                    messages.success(targetUser, " has been demoted", 16,9)
                     return false
                 elseif param == keys.n then 
                     return false end
@@ -266,4 +252,4 @@ local optionsActions = {
 -- =============
 -- Start of code
 -- =============
-selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "Press F1 to return back to desktop", username, "=== Select an option ===", 15, 3, true)
+selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "desktop", "=== Select an option ===", 15, 3, true)
