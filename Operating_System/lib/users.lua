@@ -1,6 +1,9 @@
+local state = require("lib.state")
+
 local M = {}
--- required modules
+-- required variables
 local usersDir = "operatingSystem/users/"
+
 -- ===================================================================
 -- Loads user data whenever needed by reading the .json file of a user
 -- ===================================================================
@@ -13,6 +16,7 @@ function M.loadUserMeta(username)
     file.close()
     return data
 end
+
 -- ===========================================================================
 -- This function helps to ensure that admin/dev cant delete the last admin/dev
 -- ===========================================================================
@@ -26,16 +30,7 @@ function M.countRole(role)
     end
     return count
 end
--- ========================================================
--- This function assigns the first ever user as a admin/dev 
--- ========================================================
-function M.isFirstUser()
-    if not fs.exists(usersDir) then
-        fs.makeDir(usersDir)
-        return true
-    end
-    return #fs.list(usersDir) == 1 or #fs.list(usersDir) == 0
-end
+
 -- ==============================================
 -- Creates meta data for the user at registration
 -- ==============================================
@@ -46,23 +41,19 @@ function M.createUserMeta(username)
         admin = false
     }
 
-    -- bootstrap: first user becomes admin
-    if M.isFirstUser() then
+    local userCount = #fs.list(usersDir)
+
+    if userCount == 1 then 
+        meta.role = "dev"
+        meta.admin = true
+        meta.devMode = true
+    elseif userCount == 2 then 
         meta.role = "admin"
         meta.admin = true
-    end
-
-    -- optional hardcoded dev override (safe)
-    if username == "john" then
-        meta.role = "dev"
-        meta.devMode = true
-        meta.admin = true
-        
+        meta.devMode = false
     end
 
     return meta
 end
 
 return M 
-
-
