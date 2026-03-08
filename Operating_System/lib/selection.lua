@@ -5,6 +5,8 @@ local state = require("lib.state")
 local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
 local defaultSettings = settingsLib.defaultSettings()
+local powerLib = require("lib.power")
+local powerOptionsActions = powerLib.powerOptionsActions
 
 local M = {}
 -- changing a table with no action value to a table with action value  (for example fs.list())
@@ -24,25 +26,25 @@ end
 -- ============================================================================================================
 -- This function is the core UI handler, it draws the whole UI, decides what was selected and sends that trough
 -- ============================================================================================================
-function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY, navigationTextType, title, tPosX, tPosY, canExit)
+function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType, title, tPosX, tPosY, canExit)
     if type(powerOptionsActions) ~= "table" then 
         error("SelectionLib: PowerLib isn't a table!")
     end
 
     if type(optionsActions) ~= "table" then 
-        error("SelectionLib: OptionsActions isn't a table or wasn't normalized!")
+        error("SelectionLib: [arg 1] OptionsActions isn't a table or wasn't normalized!")
     end 
 
     if not X1 or not Y1 then
-        error("SelectionLib: OptionsActions table position is missing!")
+        error("SelectionLib: [arg 2] OptionsActions table position is missing!")
     end
 
     if not powerY or not powerX then 
-        error("SelectionLib: Power table position is missing!")
+        error("SelectionLib: [arg 3] Power table position is missing!")
     end
 
-    if not navigation then 
-        error("SelectionLib: Navigation text can't be nil!")
+    if not navigationTextType then 
+        error("SelectionLib.lua: [arg 4] Type of navigation text not provided!")
     end
 
     if username ~= nil and type(username) ~= "string" then
@@ -50,22 +52,21 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
     end
 
     if not title then 
-        error("SelectionLib: Title text is missing!")
+        error("SelectionLib: [arg 5] Title text is missing!")
     end
 
     if not tPosX or not tPosY then 
-        error("SelectionLib: check if you aren't missing the titple positions")
+        error("SelectionLib: [arg 6] check if you aren't missing the titple positions")
     end
 
     if canExit == nil then 
-        error("SelectionLib: 'canExit' isn't a boolean value")
+        error("SelectionLib: [arg 7] 'canExit' isn't a boolean value")
     end
 
     if type(optionsActions[1]) == "string" then
         optionsActions = list(optionsActions)
     end
-
-    local items = optionsActions   --- <- REMOVE ITEMS AND TURN ITEMS INTO optionsActions!
+  
     local path = "/operatingSystem/logs/"
     local activeMenu = "main"
     local mainSelected = 1      
@@ -100,13 +101,13 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
         write(title)
         navigation.helper(navigationText) 
         -- UI drawing and scrolling math
-        for i = scroll + 1, math.min(scroll + visible, #items) do 
+        for i = scroll + 1, math.min(scroll + visible, #optionsActions) do 
             local Ypos = topLines +  (i - scroll)
             term.setCursorPos(startX, Ypos)
             if activeMenu == "main" and i == mainSelected then
-                write("["..items[i].name.."]")
+                write("["..optionsActions[i].name.."]")
             else
-                write(" "..items[i].name.." ")
+                write(" "..optionsActions[i].name.." ")
             end
         end
 
@@ -125,7 +126,7 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
             if param == keys[string.lower(getSettings.navigation.move.forward)] then
                 if activeMenu == "main" then 
                     mainSelected = mainSelected - 1 
-                    if mainSelected < 1 then mainSelected = #items end
+                    if mainSelected < 1 then mainSelected = #optionsActions end
                 
                 elseif activeMenu == "power" then 
                     powerSelected = powerSelected - 1
@@ -135,7 +136,7 @@ function M.selection(powerOptionsActions, optionsActions, X1, Y1, powerX, powerY
             elseif param == keys[string.lower(getSettings.navigation.move.backward)] then 
                 if activeMenu == "main" then
                     mainSelected = mainSelected + 1 
-                    if mainSelected > #items then mainSelected = 1 end
+                    if mainSelected > #optionsActions then mainSelected = 1 end
                 
                 elseif activeMenu == "power" then 
                     powerSelected = powerSelected + 1
