@@ -43,13 +43,13 @@ end
 -- ===================================================================
 -- This lets the user know that the action he confirmed was successful 
 -- ===================================================================
-function M.success(targetUser, text2, x, y)
+function M.success(targetUser, text, x, y)
     term.clear()
     header.drawHeader(username)
     header.drawClock()
     term.setCursorPos(x,y)
     term.setTextColor(colors.lime)
-    write("user "..targetUser..text2 )
+    write("user "..targetUser..text)
     term.setTextColor(settings.current.text)
     sleep(2)
 end
@@ -86,6 +86,17 @@ function M.errorPN(username, x, y, text)
     term.clear()
     header.drawHeader(username)
     header.drawClock()
+end
+
+function M.apps(username, x, y, text)
+    term.clear()
+    header.drawHeader(username)
+    header.drawClock()
+    term.setCursorPos(x,y)
+    term.setTextColor(colors.lime)
+    write(text)
+    term.setTextColor(settings.current.text)
+    sleep(2)
 end
 
 return M
