@@ -41,6 +41,9 @@ local function installApp(username)
     local f = fs.open(appsPath, "w")
     f.write(textutils.serialize(apps))
     f.close()
+
+    messages.apps(username, 12, 9, "The chosen app was installed")
+    logs.logger("appLogs", "installed"..chosenApp)
 end
 
 local function uninstallApp(username)
@@ -75,6 +78,8 @@ local function uninstallApp(username)
     local f = fs.open(appsPath, "w")
     f.write(textutils.serialize(apps))
     f.close()
+    messages.apps(username, 12, 9, "The chosen app was uninstalled")
+    logs.logger("appLogs", "installed"..chosenApp)
 end
 
 local optionsActions = {
