@@ -104,7 +104,7 @@ local function viewLogs(username)
         table.insert(logTypes, name)
     end
 
-    local chosenLog = selectionLib.selection(powerOptionsActions, logTypes, 1, 5, 42 ,18, "main menu", "=== choose a type of log ===", 15, 3, true)
+    local chosenLog = selectionLib.selection(logTypes, 1, 5, 42 ,18, "main menu", "=== choose a type of log ===", 15, 3, true)
     if chosenLog == false then 
         return false
     end
@@ -186,7 +186,7 @@ local function restoreToDefaults(username)
         table.insert(resetableUsers, user)
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, resetableUsers, 1, 5, 42, 18, "main menu", "=== Choose an option ===", 15, 3, true)
+    local targetUser = selectionLib.selection(resetableUsers, 1, 5, 42, 18, "main menu", "=== Choose a user ===", 15, 3, true)
     if not targetUser then return end
 
     while true do 
@@ -230,7 +230,7 @@ local function promoteToDev(username)
             return false
         end
         
-        local targetUser = selectionLib.selection(powerOptionsActions, promotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10,3, true) 
+        local targetUser = selectionLib.selection(promotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10,3, true) 
         if not targetUser then return end
     
         while true do 
@@ -280,7 +280,7 @@ local function demoteDev(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(powerOptionsActions, demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===", 10, 3, true )
+    local targetUser = selectionLib.selection(demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===", 10, 3, true )
     if not targetUser then return false end
     -- disallow currently logged in user to demote himself
     if targetUser == username then 
@@ -326,4 +326,4 @@ local optionsActions = {
     {name = "Demote developer to admin or user", action = demoteDev },
 }
 
-selectionLib.selection(powerOptionsActions, optionsActions, 1, 5, 42, 18, "desktop", "=== Choose an option ===", 15, 3, true)
+selectionLib.selection(optionsActions, 1, 5, 42, 18, "desktop", "=== Developer tools ===", 15, 3, true)
