@@ -1,6 +1,6 @@
 # Operating System (CC:Tweaked)
 A mock operating system project for cc:tweaked
-It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file presistence and it serves primarly as a learning project
+It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file persistence and it serves primarily as a learning project
 I HEAVILY recommend reading the known issues and additional notes before installing this 
 
 ## Contents
@@ -60,7 +60,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - App store for desktop
 - File explorer for desktop
 - Custom read and key pulling event to be able to pull events so that you can both write and use keybinds at the same time
-- Custom installation proccess that uses pastebin combined with wget to let users download the code more comfortably
+- Custom installation process that uses pastebin combined with wget to let users download the code more comfortably
   
 ### Ideas (not 100% planned)
 - Monitor support
@@ -119,13 +119,13 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - "Guest" account has been temporarily removed and is not available in current versions
 - The clock won't update during login/register due to the read event being triggered
 - I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
-- This code is NOT made for monitors, it is only made to be used on the terminal for now tho i intend to introduce monitor support later in the future
+- This code is NOT made for monitors, it is only made to be used on the terminal for now though i intend to introduce monitor support later in the future
 - Custom installation process is missing (no pastebin or wget) for now refer to the installation steps below
 - SECURITY WARNING: "terminate" event is not being handled so far so be aware that anyone even basic user can terminate the code at any time and access cc:tweaked terminal  
 
 ## Additional notes
 - This project is still under active development and serves primarily as a learning exercise
-- Expect incomplete features and bugs tho i will try to lower the amount of bugs and try to fix most if not all before i release each version
+- Expect incomplete features and bugs though i will try to lower the amount of bugs and try to fix most if not all before i release each version
 - If you have any questions and/or suggestions on how i could change and/or improve the code feel free to contact me on discord at duolingo6954
 
 ### Installation steps
@@ -169,7 +169,7 @@ This program is currently a standalone and not a part of the OS
  - Sell/buy functions
  - Checking if balance exists
  - Logging history of buying/selling
- - Selected items are now highlited in [] rather than making the user write the number of a item
+ - Selected items are now highlighted in [] rather than making the user write the number of a item
  - User interface selection can now be moved with w and s keys
 
  ### v0.1
