@@ -1,13 +1,15 @@
 # Operating System (CC:Tweaked)
-A mock operating system project for cc:tweaked
-It focuses on user data, user permissions, basic hierarchy (Dev -> Admin -> User), user authentication, file persistence and it serves primarily as a learning project
-I HEAVILY recommend reading the known issues and additional notes before installing this 
+
+A modular operating system-style environment for CC:Tweaked.
+The system provides a structured platform for building and running applications inside ComputerCraft computers. It includes a user authentication system, permission hierarchy, persistent user settings, logging and a keyboard-driven terminal UI framework.
+Applications can be added on top of the system without modifying the core OS allowing the environment to be extended with new programs and tools
 
 ## Contents
 - [Features](#features)
 - [Admin Dashboard](#admin-dashboard)
 - [Dev Tools](#dev-tools)
 - [Settings](#settings)
+- [App Store](#App-Store)
 - [Roadmap](#roadmap)
 - [Changelog](#changelog)
 - [Known Issues](#known-issues)
@@ -22,6 +24,7 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Admin dashboard
 - Dev tools
 - Settings
+- App store
 - Keyboard input (UI Navigation)
 - UI Drawing and navigation
 - Multiple menus
@@ -50,15 +53,18 @@ I HEAVILY recommend reading the known issues and additional notes before install
 - Ability to change password
 - Ability to change username
 
+### App Store
+- allows users to install and uninstall games that are available
+
 # Roadmap
 
 ## In progress
-
-- App store
+- Game where you guess numbers from 1-1000 depending on the difficulty
+- Shop game (integration of the vending machine game but differently)
   
 ### Planned
-- App store for desktop
 - File explorer for desktop
+- Blackjack
 - Custom read and key pulling event to be able to pull events so that you can both write and use keybinds at the same time
 - Custom installation process that uses pastebin combined with wget to let users download the code more comfortably
   
@@ -70,12 +76,15 @@ I HEAVILY recommend reading the known issues and additional notes before install
 
 ## Changelog
 
+### v1.6
+- Changes to UI (mostly menu titles)
+- Users can now install and uninstall apps via the app store
+
 ### v1.5 
 - Users can now change their date format (e.g: DD/MM/YYYY)
 - Users can now change with which keys they navigate the menu (e.g: WSAD to move forward, backward, left and right and F1 to return to previous menu)
 - Users can now reset their settings to default
-- Users can now change their password
-- Users can now change their username
+- Users can now change their password and username
 
 ### v1.4
 - Users can now toggle clock to false or true 
