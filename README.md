@@ -59,7 +59,7 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ## In progress
-
+- custom read event
   
 ### Planned
 - File explorer for desktop
