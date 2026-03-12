@@ -59,14 +59,17 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ## In progress
-- Game where you guess numbers from 1-1000 depending on the difficulty
-- Shop game (integration of the vending machine game but differently)
+
   
 ### Planned
 - File explorer for desktop
 - Blackjack
+- Guessing game
+- Shop game
 - Custom read and key pulling event to be able to pull events so that you can both write and use keybinds at the same time
 - Custom installation process that uses pastebin combined with wget to let users download the code more comfortably
+- UI refactoring
+- Terminate handling
   
 ### Ideas (not 100% planned)
 - Monitor support
