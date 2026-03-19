@@ -11,6 +11,9 @@ local messages = require("UI.messages")
 local username = state.getUsername()
 local appsPath = "operatingSystem/users/"..username.."/apps.json"
 
+-- ==================================================================================
+-- This allows the user to install apps simply by turning "installed = false" to true
+-- ==================================================================================
 local function installApp(username)
     local file = fs.open(appsPath, "r")
     local apps = textutils.unserialize(file.readAll())
@@ -28,11 +31,11 @@ local function installApp(username)
     end
     
     if #appOptionsActions == 0 then 
-        messages.noUsers("No apps to install")
+        messages.noUsers("No apps to install") -- this module is normally used for devtools and admin dashboard but i didnt see a point in making a new one so i used this one
         return false
     end
 
-    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "desktop", "=== Choose an app ===", 17, 3, true)
+    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an app ===", 17, 3, true)
 
     if chosenApp == false then return false end 
     rawChosenApp = chosenApp:gsub(" ", "_")
@@ -42,10 +45,13 @@ local function installApp(username)
     f.write(textutils.serialize(apps))
     f.close()
 
-    messages.apps(username, 12, 9, "The chosen app was installed")
-    logs.logger("appLogs", "installed"..chosenApp)
+    messages.success(nil, chosenApp.." was installed")
+    logs.logger("app_store_logs", " installed "..chosenApp)
 end
 
+-- ====================================================================================
+-- This allows the user to uninstall apps simply by turning "installed = true" to false
+-- ====================================================================================
 local function uninstallApp(username)
     local file = fs.open(appsPath, "r")
     local apps = textutils.unserialize(file.readAll())
@@ -65,11 +71,11 @@ local function uninstallApp(username)
     end 
 
     if #appOptionsActions == 0 then
-        messages.noUsers("No apps to uninstall") -- <- originally used for devTols and adminDashboard but there is no point in making another module 
+        messages.noUsers("No apps to uninstall") -- this module is normally used for devtools and admin dashboard but i didnt see a point in making a new one so i used this one
         return false
     end 
 
-    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "desktop", "=== Choose an app ===", 17, 3, true)
+    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an app ===", 17, 3, true)
 
     if chosenApp == false then return false end
     rawChosenApp = chosenApp:gsub(" ", "_")
@@ -78,8 +84,8 @@ local function uninstallApp(username)
     local f = fs.open(appsPath, "w")
     f.write(textutils.serialize(apps))
     f.close()
-    messages.apps(username, 12, 9, "The chosen app was uninstalled")
-    logs.logger("appLogs", "installed"..chosenApp)
+    messages.success(nil, chosenApp.." was uninstalled")
+    logs.logger("app_store_logs", " uninstalled "..chosenApp)
 end
 
 local optionsActions = {
@@ -87,4 +93,4 @@ local optionsActions = {
     {name = "Uninstall apps", action = uninstallApp},
 }
 
-selectionLib.selection(optionsActions, 1, 5, 42, 18, "main menu", "=== App store ===", 20, 3, true)
+selectionLib.selection(optionsActions, 1, 5, 42, 18, "desktop", "=== App store ===", 20, 3, true)
