@@ -60,7 +60,7 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ## In progress
-- Utilization of customRead 
+- Terminate event handling 
   
 ### Planned
 - File explorer for desktop
@@ -69,7 +69,6 @@ Applications can be added on top of the system without modifying the core OS all
 - Shop game
 - Custom installation process that uses pastebin combined with wget to let users download the code more comfortably
 - UI refactoring
-- Terminate handling
   
 ### Ideas (not 100% planned)
 - Monitor support
