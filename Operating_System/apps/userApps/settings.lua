@@ -3,6 +3,7 @@ package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. 
 local users = require("lib.users")
 local perms = require("lib.permissions")
 local state = require("lib.state")
+local terminate = require("lib.terminate")
 local logs = require("lib.writeLog")
 local settings = require("lib.settingsManager")
 local header = require("UI.header")
@@ -200,26 +201,26 @@ end
 -- ==========================================================
 local function restoreToDefaults(username)
     while true do
-        header.drawHeader(username)
-        header.drawClock()
-        navigation.helper("")
-        term.setCursorPos(10,9)
-        write("Reset settings to default? [Y/N]")
+        messages.confirm(nil, nil, nil, nil, "Reset settings to default? [Y/N]")
 
-        local event, param = os.pullEvent()
-
-        if param == keys.y or param == keys.z then 
-            settings.restoreSettings(username)
-            term.clear()
-            header.drawHeader(username)
-            header.drawClock()
-            term.setCursorPos(6,9)
-            term.setTextColor(colors.lime)
-            write("Your settings have been reset to default")
-            sleep(2)
-            return false
-        elseif param == keys.n then 
-            return false end
+        local event, param = os.pullEventRaw()
+        if event == "key" then 
+            if param == keys.y or param == keys.z then 
+                settings.restoreSettings(username)
+                term.clear()
+                header.drawHeader(username)
+                header.drawClock()
+                term.setCursorPos(6,9)
+                term.setTextColor(colors.lime)
+                write("Your settings have been reset to default")
+                sleep(2)
+                return false
+            elseif param == keys.n then 
+                return false 
+            end 
+        elseif event == "terminate" then 
+            terminate.terminateHandling(username)
+        end
     end
 end
 
