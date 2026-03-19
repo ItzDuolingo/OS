@@ -6,6 +6,7 @@ local state = require("lib.state")
 local logs = require("lib.writeLog")
 local settings = require("lib.settingsManager")
 local header = require("UI.header")
+local cr = require("UI.customRead")
 local messages = require("UI.messages")
 local navigation = require("UI.navigationHelp")
 local powerLib = require("lib.power")
@@ -14,7 +15,9 @@ local powerOptionsActions = powerLib.powerOptionsActions
 
 local username = state.getUsername() 
 local settingsPath = "/operatingSystem/users/"..username.."/settings.json"
-
+-- =================================================
+-- This allows the user to change themes of their OS
+-- =================================================
 local function setTheme(username)
     local themeOptions = {}
 
@@ -25,6 +28,8 @@ local function setTheme(username)
                 local current = settings.loadSettings(username)
                 current.ui.background = theme.data.background
                 current.ui.textColor.ui = theme.data.text
+                current.ui.boxColor = theme.data.boxColor
+                current.ui.textColor.boxText = theme.data.boxText
 
                 local file = fs.open(settingsPath, "w")
                 file.write(textutils.serialize(current))
@@ -41,10 +46,13 @@ local function setTheme(username)
         return false
     end
 
-    messages.setSettings(14, 9, "theme", username) 
+    messages.setSettings("Your theme has been saved", nil, 1, nil) 
     logs.logger("settings", " changed", " theme to ", chosenTheme)
 end
 
+-- =================================================
+-- This allows the user to toggle their clock ON/OFF
+-- =================================================
 local function toggleClock(username)
     local clockOptionsActions = {}
     settings.loadSettings(username)
@@ -68,11 +76,13 @@ local function toggleClock(username)
     header.drawClock()
     term.setCursorPos(16, 9)
     term.setTextColor(colors.lime)
-    write("Clock toggled to "..tostring(settings.current.clockEnabled))
+    messages.setSettings("Clock toggled to "..tostring(settings.current.clockEnabled), nil, 1, nil) 
     logs.logger("settings", " toggled", " clock to ", tostring(settings.current.clockEnabled))
-    sleep(2)
 end
 
+-- ==================================================================
+-- This allows the user to change their time format (e.g: DD/MM/YYYY)
+-- ==================================================================
 local function changeTimeFormat(username)
     local fomratOptions = {}
     settings.loadSettings(username)
@@ -93,10 +103,13 @@ local function changeTimeFormat(username)
 
     term.clear()
     header.drawHeader()
-    messages.setSettings(11, 9, "time format", username)
+    messages.setSettings("Your time format was saved", nil, 1, nil) 
     logs.logger("settings", " changed", " time format to ", chosenFormat)
 end
 
+-- ==================================================================================
+-- This allows the user to change their key that they return back to other menus with
+-- ==================================================================================
 local function backKeybind(username)
     local backKeyOptions = {}
     settings.loadSettings(username)
@@ -118,10 +131,13 @@ local function backKeybind(username)
     term.clear()
     header.drawHeader(username)
     header.drawClock()
-    messages.setSettings(4, 9, "Your key to return with", username)
+    messages.setSettings("Your key to return with was saved", nil, 1, nil) 
     logs.logger("settings", " changed", " key to return with to ", chosenBackKey)
 end
 
+-- ===========
+-- WSAD preset
+-- ===========
 local function WSAD(username)
     local getSettings = settings.loadSettings(username)
     getSettings.navigation.move.forward = "W"
@@ -135,10 +151,13 @@ local function WSAD(username)
 
     header.drawHeader(username)
     header.drawClock()
-    messages.setSettings(7, 9, "navigation preset", username)  
+    messages.setSettings("Your navigation preset has been saved", nil, 1, nil) 
     logs.logger("settings", " changed ", "navigation preset to WSAD")             
 end
 
+-- =============
+-- Arrows preset
+-- =============
 local function Arrows(username)
     local getSettings = settings.loadSettings(username)
     getSettings.navigation.move.forward = "up"
@@ -152,9 +171,10 @@ local function Arrows(username)
 
     header.drawHeader(username)
     header.drawClock()
-    messages.setSettings(7, 9, "navigation preset", username)  
+    messages.setSettings("Your navigation preset has been saved", nil, 1, nil) 
     logs.logger("settings", " changed ", "navigation preset to Arrows")       
 end
+
 
 local changeNavigOptionsActions = {
     {name = "WSAD", action = WSAD},
@@ -175,6 +195,9 @@ local function keybindsMenu(username)
     selectionLib.selection(navigationPresetOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an option ===", 15, 3, true)
 end
 
+-- ==========================================================
+-- This allows the user to restore settings values to default
+-- ==========================================================
 local function restoreToDefaults(username)
     while true do
         header.drawHeader(username)
@@ -200,53 +223,50 @@ local function restoreToDefaults(username)
     end
 end
 
+-- =============================================
+-- This allows the user to change their password
+-- =============================================
 local function changePassword(username)
     local passwordPath = "/operatingSystem/users/"..username.."/password.txt"
 
-    while true do
-        term.clear()
-        header.drawHeader(username)
-        header.drawClock()
-        term.setCursorPos(15,9)
-        write("Write a new password: ")
-        local newPass = read("*")
+    while true do        
+        local newPass = cr.customRead(27, "*", false, true, false,  "", 1, nil)
+
+        if newPass == false then return end 
 
         local f1 = fs.open(passwordPath, "r")
         local oldPass = f1.readAll()
         f1.close()
         
         if newPass == oldPass then
-            messages.errorPN(username, 2, 11, "New password must be different from old password") 
+            messages.errorPN("New Password must be different from old password", nil, nil, 1, 2) 
         elseif #newPass < 5 then 
-            messages.errorPN(Username, 7, 11, "Password must be at least 5 characters")
-        elseif newPass == "" or newPass == "admin" or newPass == "admins" or newPass == "developer" or newPass == "developers" or newPass == "guest" then
-            messages.errorPN(username, 18, 11, "Invalid password")
+            messages.errorPN("Password must be at least 5 characters long", nil, nil, 1, 2)
         else
             local f2 = fs.open(passwordPath, "w")
             f2.write(newPass)
             f2.close()
-            messages.setSettings(11, 9, "password", username)
+            messages.successPN("Password updated", nil, nil, 1, 2)
             logs.logger("settings", " changed ", "password to "..newPass)
             return false
         end
     end
 end
 
+-- =============================================
+-- This allows the user to change their username 
+-- =============================================
 local function changeUsername(username)
     while true do 
-        term.clear()
-        header.drawHeader(username)
-        header.drawClock()
-        term.setCursorPos(15,9)
-        write("Enter a new username: ")
-        local newName = read()
-
+        local newName = cr.customRead(27, "*", true, false, false, "", 1, nil)
+        if newName == false then return end 
+        
         if #newName < 3 then
-            messages.errorPN(username, 7, 11, "Username must be at least 3 characters") 
-        elseif newName == "admin" or newName == "admins" or newName == "developer" or newName == "developers" then 
-            messages.errorPN(username, 18, 11, "Invalid username")
+            messages.errorPN("Username must be at least 3 characters long", nil, nil, 1, 2) 
+        elseif newName == "admin" or newName == "admins" or newName == "administrator" or newName == "administrators" or newName == "dev" or newName == "devs"or newName == "developer" or newName == "developers" then  
+            messages.errorPN("Invalid username", nil, nil, 1, 2)
         elseif newName == username then
-            messages.errorPN(username, 2, 11, "New username must be different from old username") 
+            messages.errorPN("New username must be different from old username", nil, nil, 1, 2)
         else
             local oldNameDir = "operatingSystem/users/"..username
             local newNameDir = "operatingSystem/users/"..newName
