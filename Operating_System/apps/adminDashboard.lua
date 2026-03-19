@@ -4,6 +4,7 @@ local users = require("lib.users")
 local perms = require("lib.permissions")
 local logs = require("lib.writeLog")
 local settings = require("lib.settingsManager")
+local terminate = require("lib.terminate")
 local state = require("lib.state")
 local cr = require("UI.customRead")
 local header = require("UI.header")
@@ -90,7 +91,7 @@ local function deleteUser(username)
     while true do
         messages.confirm("Delete ",targetUser, "WARNING: This will delete all user's data", -1)
         
-        local event, param = os.pullEvent()
+        local event, param = os.pullEventRaw()
         
         if event == "key" then 
             if param == keys.y or param == keys.z then 
@@ -98,7 +99,11 @@ local function deleteUser(username)
                 logs.logger("admin", " deleted ", targetUser)
                 messages.success(targetUser, " has been successfully deleted")
                 return false
-            elseif param == keys.n then return false end 
+            elseif param == keys.n then 
+                return false 
+            end
+        elseif event == "terminate" then 
+            terminate.terminateHandling(username)
         end        
     end
 end
@@ -139,7 +144,7 @@ local function promoteToAdmin(username)
         while true do 
             messages.confirm("Promote ", targetUser.." to admin","WARNING: This will grant the user higher power!", -1)
         
-            local event, param = os.pullEvent()
+            local event, param = os.pullEventRaw()
             if event == "key" then 
                 if param == keys.y or param == keys.z then
                     local meta = users.loadUserMeta(targetUser)
@@ -152,9 +157,12 @@ local function promoteToAdmin(username)
                     logs.logger("admin", " promoted ", targetUser, " to admin")
                     term.clear()
                     messages.success(targetUser, " has been promoted to admin")
-                    return false end 
-                elseif param == keys.n then 
                     return false 
+                elseif param == keys.n then 
+                    return false
+                end
+            elseif event == "terminate" then 
+                terminate.terminateHandling(username) 
             end
         end
     end
@@ -222,7 +230,10 @@ local function demoteAdmin(username)
                     messages.success(targetUser, " has been demoted")
                     return false
                 elseif param == keys.n then 
-                    return false end
+                    return false 
+                end
+            elseif event == "terminate" then 
+                terminate.terminateHandling(username)
             end
         end
     end
