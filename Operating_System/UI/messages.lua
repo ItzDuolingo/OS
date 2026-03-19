@@ -1,8 +1,9 @@
 package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. package.path
 
--- requiered modules
+-- required modules
 local header = require("UI.header")
 local state = require("lib.state")
+local ct = require("lib.centerText")
 local username = state.getUsername()
 local settings = require("lib.settingsManager")
 
@@ -14,79 +15,116 @@ function M.noUsers(text)
     term.clear()
     header.drawHeader(username)
     header.drawClock()
-    term.setCursorPos(17,9)
     term.setTextColor(colors.red)
-    write(text)
-    term.setTextColor(settings.current.text)
+    ct.centerText(text, nil, 1, nil)
     sleep(2)
 end
 
 -- =============================================================================================
 -- This message asks the user whether they want to confirm or deny the action up ahead using Y/N
 -- =============================================================================================
-function M.confirm(t1, targetUser, t2, x, y)
+function M.confirm(t1, targetUser, t2, yOffset, text)
     term.clear() 
     header.drawHeader(username)
     header.drawClock()
-    if x and y then 
-        term.setCursorPos(x, y)
+    
+    if targetUser then 
+        ct.centerText(t1..targetUser.."? [Y/N]", nil, 1, yOffset)
     else
-        term.setCursorPos(16,8)
+        ct.centerText(text, nil, 1, yOffset)
     end
-    write(t1 .. targetUser .." ? [Y/N]")
-    term.setCursorPos(5,10)
-    term.setTextColor(colors.orange)
-    write(t2 or " ")
-    term.setTextColor(settings.current.text)
+
+    if t2 then
+        term.setTextColor(colors.orange)
+        ct.centerText(t2, nil, 1, yOffset + 2) 
+    end
 end
 
 -- ===================================================================
 -- This lets the user know that the action he confirmed was successful 
 -- ===================================================================
-function M.success(targetUser, text, x, y)
+function M.success(targetUser, text)
     term.clear()
     header.drawHeader(username)
     header.drawClock()
-    term.setCursorPos(x,y)
     term.setTextColor(colors.lime)
-    write("user "..targetUser..text)
-    term.setTextColor(settings.current.text)
+    if targetUser then 
+        ct.centerText("User "..targetUser..text, nil, 1)
+    else
+        ct.centerText(text, nil, 1, nil)
+    end
+    sleep(2)
+end
+
+-- =====================
+-- General error message 
+-- =====================
+function M.error(text, y, textHeight, yOffset)
+    term.clear()
+    header.drawHeader()
+    header.drawClock()
+    term.setTextColor(colors.red)
+    ct.centerText(text, y, textHeight, yOffset)
     sleep(2)
 end
 
 -- ======================================================
--- this lets the user know that their setting was applied
+-- This lets the user know that their setting was applied
 -- ======================================================
-function M.setSettings(x, y, settingName, username)
+function M.setSettings(text, y , textHeight, yOffset, username)
     local username = state.getUsername()
     term.clear()
     header.drawHeader(username)
     header.drawClock()
-    term.setCursorPos(x,y)
     term.setTextColor(colors.lime)
-    write("Your "..settingName.." has been saved")
-    term.setTextColor(settings.current.text)
+    ct.centerText(text, y, textHeight, yOffset)
     sleep(2)
 end
 
--- ==============================================
--- error message for password or username actions
--- ==============================================
-function M.errorPN(username, x, y, text)
+-- ======================================
+-- Error message for password or username
+-- ======================================
+function M.errorPN(text, y, x, textHeight, yOffset, username)
     if username then
         settings.loadSettings(username)
     end
-
-    term.setCursorPos(x, y)
+    
     term.setTextColor(colors.red)
-    write(text)
-    term.setTextColor(settings.current.text)
-    sleep(2)
 
-    term.clear()
-    header.drawHeader(username)
-    header.drawClock()
+    if x and y then 
+        term.setCursorPos(x, y)
+        write(text)
+        sleep(2)
+    else
+        ct.centerText(text, y, textHeight, yOffset)
+        sleep(2)
+    end
+
+    term.setTextColor(settings.current.text)
 end
+
+-- ========================================
+-- Success message for password or username
+-- ========================================
+function M.successPN(text, y, x, textHeight, yOffset, username)
+    if username then
+        settings.loadSettings(username)
+    end
+    
+    term.setTextColor(colors.lime)
+
+    if x and y then 
+        term.setCursorPos(x, y)
+        write(text)
+        sleep(2)
+    else
+        ct.centerText(text, y, textHeight, yOffset)
+        sleep(2)
+    end
+
+    term.setTextColor(settings.current.text)
+end
+
 
 function M.apps(username, x, y, text)
     term.clear()
