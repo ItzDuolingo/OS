@@ -7,6 +7,8 @@ local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
 local defaultSettings = settingsLib.defaultSettings()
 local logs = require("lib.writeLog")
+local ct = require("lib.centerText")
+local cr = require("UI.customRead")
 local header = require("UI.header")
 local messages = require("UI.messages")
 local navigation = require("UI.navigationHelp")
@@ -18,49 +20,33 @@ local powerOptionsActions = powerLib.powerOptionsActions
 -- This gives the developer full uncontrolled access to the cc:tweaked shell/terminal
 -- ==================================================================================
 local function fullAccess(username)
-        term.clear()
-        header.drawHeader(username)
-        header.drawClock()
-        term.setCursorPos(1,8)
-        write("Are you sure you want to access the terminal? [Y/N]")
-        term.setCursorPos(1,10)
-        term.setTextColor(colors.orange)
-        write("WARNING: This gives you full uncotrolled access to the cc:tweaked terminal")
-        term.setTextColor(colors.black)
-        term.setCursorBlink(false)
+    messages.confirm(nil, nil, "Warning: This gives you full access to the terminal", -1, "Are you sure you want access to the terminal? [Y/N]")
 
-        while true do
+     while true do
+        local event, param = os.pullEvent()
 
-            local event, param = os.pullEvent()
+        if event == "key" then 
+            if param == keys.y or param == keys.z then
+                -- consume "char" event to prevent read() from capturing Y/Z input
+                os.pullEvent("char")
 
-            if event == "key" then 
-                if param == keys.y or param == keys.z then 
-                    -- consume "char" event to prevent read() from capturing Y/Z input
-                    os.pullEvent("char")
+                local input = cr.customRead(27, nil, false, false, true, "", 3, "'terminal'")
+                if input == false then return end 
+
+                if input == "terminal" then
+                    messages.success(nil, "You will gain access to the terminal soon...")
+                    term.setBackgroundColor(colors.black)
                     term.clear()
-                    header.drawHeader(username)
-                    header.drawClock()
-                    term.setCursorPos(9,8)
-                    write("To gain full access to the terminal,")
-                    term.setCursorPos(15,10)
-                    write("write 'terminal' below") 
-                    term.setCursorPos(22,12)
-                    local input = read()
-                    
-                    if input == "terminal" then
-                        term.clear()
-                        term.setCursorPos(5,10)
-                        write("You will gain access to the terminal soon...")
-                        sleep(3)
-                        term.setBackgroundColor(colors.black)
-                        term.clear()
-                        term.setCursorPos(1,1)
-                        logs.logger("dev", " gained full access to the terminal ", targetUser)
-                        shell.run("shell")
-                    end
-                elseif param == keys.n then 
-                    return false 
+                    term.setCursorPos(1,1)
+                    logs.logger("dev", " gained full access to the terminal ", targetUser)
+                    shell.run("shell")
+                else 
+                    messages.error("Wrong input", nil, 1, nil)
+                    return 
                 end
+            elseif param == keys.n then 
+                return false 
+            end
         end
     end
 end
@@ -105,12 +91,11 @@ local function viewLogs(username)
     end
 
     local chosenLog = selectionLib.selection(logTypes, 1, 5, 42 ,18, "main menu", "=== choose a type of log ===", 15, 3, true)
-    if chosenLog == false then 
-        return false
-    end
+    if chosenLog == false then return end 
 
     term.clear()
     term.setCursorPos(1,1)
+    print(chosenLog)
     local logPath = dirPath..chosenLog..".txt"
     scroll = 0 
     hScroll = 0
@@ -189,8 +174,8 @@ local function restoreToDefaults(username)
     local targetUser = selectionLib.selection(resetableUsers, 1, 5, 42, 18, "main menu", "=== Choose a user ===", 15, 3, true)
     if not targetUser then return end
 
-    while true do 
-        messages.confirm("Reset settings for ", targetUser, "", 10, 9)
+    while true do
+        messages.confirm("Reset settings for ", targetUser)
 
         local event, param = os.pullEvent()
         
@@ -198,7 +183,7 @@ local function restoreToDefaults(username)
             if param == keys.y or param == keys.z then
                 settings.restoreSettings(targetUser) 
                 logs.logger("dev", " reset settings for ", targetUser)
-                messages.success(targetUser, "'s settings have been reset", 10,9)
+                messages.success(targetUser, "'s settings have been reset")
                 return false
             elseif param == keys.n then 
                 return false 
@@ -208,7 +193,7 @@ local function restoreToDefaults(username)
 end
 
 -- =====================================================
--- Allows devs to promote admins and basic users to devs
+-- Allows devs to promote admins and users to devs
 -- =====================================================
 local function promoteToDev(username)
     local usersToPromote = "operatingSystem/users/"
@@ -234,8 +219,7 @@ local function promoteToDev(username)
         if not targetUser then return end
     
         while true do 
-            messages.confirm("Promote ", targetUser, "WARNING: This grants the user higher power")
-
+            messages.confirm("Promote ", targetUser.. " to developer", "Warning: This will grant user higher power!", -1 )
             local event, param = os.pullEvent()
 
             if event == "key" then 
@@ -249,7 +233,7 @@ local function promoteToDev(username)
                     file.write(textutils.serialize(meta))
                     file.close()
                     logs.logger("dev", " promoted ", targetUser, " to developer")
-                    messages.success(targetUser, " has been promoted to developer", 5, 9)
+                    messages.success(targetUser, " has been promoted to developer")
                     return
                 elseif param == keys.n then 
                     return false
@@ -281,22 +265,20 @@ local function demoteDev(username)
     end
 
     local targetUser = selectionLib.selection(demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===", 10, 3, true )
-    if not targetUser then return false end
+    if not targetUser then return end
     -- disallow currently logged in user to demote himself
     if targetUser == username then 
         term.clear()
         header.drawHeader(username)
         header.drawClock()
-        term.setCursorPos(13,9)
         term.setTextColor(colors.red)
-        write("You cannot demote yourself")
-        term.setTextColor(colors.black)
+        ct.centerText("You cannot demote yourself", nil, 1, nil)
         sleep(2)
         return false 
     end 
 
     while true do
-        messages.confirm("Demote ", targetUser, "",16, 9)
+        messages.confirm("Demote ", targetUser)
         local event, param = os.pullEvent()
 
         if event == "key" then if
@@ -310,7 +292,7 @@ local function demoteDev(username)
                 file.write(textutils.serialize(meta))
                 file.close()
                 logs.logger("dev", " demoted ", targetUser, " from developer to user")
-                messages.success(targetUser, " has been demoted", 16, 9)
+                messages.success(targetUser, " has been demoted")
                 return
             elseif param == keys.n then 
                 return false end
