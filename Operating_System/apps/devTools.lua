@@ -3,6 +3,7 @@ package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. 
 local users = require("lib.users")
 local perms = require("lib.permissions")
 local state = require("lib.state")
+local terminate = require("lib.terminate")
 local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
 local defaultSettings = settingsLib.defaultSettings()
@@ -23,7 +24,7 @@ local function fullAccess(username)
     messages.confirm(nil, nil, "Warning: This gives you full access to the terminal", -1, "Are you sure you want access to the terminal? [Y/N]")
 
      while true do
-        local event, param = os.pullEvent()
+        local event, param = os.pullEventRaw()
 
         if event == "key" then 
             if param == keys.y or param == keys.z then
@@ -47,6 +48,8 @@ local function fullAccess(username)
             elseif param == keys.n then 
                 return false 
             end
+        elseif event == "terminate" then
+            terminate.terminateHandling(username) 
         end
     end
 end
@@ -177,7 +180,7 @@ local function restoreToDefaults(username)
     while true do
         messages.confirm("Reset settings for ", targetUser)
 
-        local event, param = os.pullEvent()
+        local event, param = os.pullEventRaw()
         
         if event == "key" then 
             if param == keys.y or param == keys.z then
@@ -188,6 +191,8 @@ local function restoreToDefaults(username)
             elseif param == keys.n then 
                 return false 
             end
+        elseif event == "terminate" then 
+            terminate.terminateHandling(username)
         end
     end
 end
@@ -209,37 +214,40 @@ local function promoteToDev(username)
             end
         end
     end
-        -- kicking back to main menu if no users to promote
-        if #promotableUsers == 0 then 
-            messages.noUsers("No users to promote")
-            return false
-        end
-        
-        local targetUser = selectionLib.selection(promotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10,3, true) 
-        if not targetUser then return end
-    
-        while true do 
-            messages.confirm("Promote ", targetUser.. " to developer", "Warning: This will grant user higher power!", -1 )
-            local event, param = os.pullEvent()
 
-            if event == "key" then 
-                if param == keys.y or param == keys.z then 
-                    local meta = users.loadUserMeta(targetUser)
-                    meta.role = "dev"
-                    meta.devMode = true
-                    meta.admin = true
-                    local metaPath = usersToPromote..targetUser.."/meta.json"
-                    local file = fs.open(metaPath, "w")
-                    file.write(textutils.serialize(meta))
-                    file.close()
-                    logs.logger("dev", " promoted ", targetUser, " to developer")
-                    messages.success(targetUser, " has been promoted to developer")
-                    return
-                elseif param == keys.n then 
-                    return false
-                end
+        -- kicking back to main menu if no users to promote
+    if #promotableUsers == 0 then 
+        messages.noUsers("No users to promote")
+        return false
+    end
+        
+    local targetUser = selectionLib.selection(promotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10,3, true) 
+    if not targetUser then return end
+    
+    while true do 
+        messages.confirm("Promote ", targetUser.. " to developer", "Warning: This will grant user higher power!", -1 )
+        local event, param = os.pullEventRaw()
+
+        if event == "key" then 
+            if param == keys.y or param == keys.z then 
+                local meta = users.loadUserMeta(targetUser)
+                meta.role = "dev"
+                meta.devMode = true
+                meta.admin = true
+                local metaPath = usersToPromote..targetUser.."/meta.json"
+                local file = fs.open(metaPath, "w")
+                file.write(textutils.serialize(meta))
+                file.close()
+                logs.logger("dev", " promoted ", targetUser, " to developer")
+                messages.success(targetUser, " has been promoted to developer")
+                return
+            elseif param == keys.n then 
+                return false
             end
+        elseif event == "terminate" then 
+            terminate.terminateHandling(username)
         end
+    end
 end
 
 -- ===================================
@@ -281,8 +289,8 @@ local function demoteDev(username)
         messages.confirm("Demote ", targetUser)
         local event, param = os.pullEvent()
 
-        if event == "key" then if
-            param == keys.z or param == keys.y then 
+        if event == "key" then 
+            if param == keys.z or param == keys.y then 
                 local meta = users.loadUserMeta(targetUser)
                 meta.role = "user"
                 meta.admin = false
@@ -295,8 +303,11 @@ local function demoteDev(username)
                 messages.success(targetUser, " has been demoted")
                 return
             elseif param == keys.n then 
-                return false end
+                return false 
             end
+        elseif event == "terminate" then 
+            terminate.terminateHandling(username)
+        end
     end
 end
 
