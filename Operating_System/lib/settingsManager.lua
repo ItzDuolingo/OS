@@ -10,6 +10,8 @@ local M = {}
 M.current = {
     background = colors.lightGray,
     text = colors.black,
+    boxColor = colors.gray,
+    boxText = colors.white,
     clockEnabled = true,
     timeFormat = "DD/MM/YYYY",
     navigationPreset = "WSAD",
@@ -69,7 +71,9 @@ function M.loadSettings(username)
         M.current.text = colors[settings.ui.textColor.ui] or colors.black
         M.current.timeFormat = settings.date.format 
         M.current.returnKey = settings.navigation.back
-        M.current.clockEnabled = settings.clock.enabled  
+        M.current.clockEnabled = settings.clock.enabled
+        M.current.boxColor = colors[settings.ui.boxColor] or colors.lightGray
+        M.current.boxText = colors[settings.ui.textColor.boxText] or colors.white
         if M.current.clockEnabled == nil then 
             M.current.clockEnabled = true 
         end
@@ -95,6 +99,8 @@ end
 function M.applyTheme(themeData)
     M.current.background = colors[themeData.background] or colors.lightGray
     M.current.text = colors[themeData.text] or colors.black
+    M.current.boxColor = colors[themeData.boxColor] or colors.lightGray
+    M.current.boxText = colors[themeData.boxText] or colors.white
 end
 
 -- ==============
@@ -160,9 +166,9 @@ end
 
 -- options to be used for changing theme
 M.themes = {
-    {name = "Dark", data = {background = "black", text = "white"}},
-    {name = "Ash", data = {background = "gray", text = "white"}},
-    {name = "Light", data = {background = "lightGray", text = "black"}},
+    {name = "Dark", data = {background = "black", text = "white", boxColor = "gray", boxText = "white"}},
+    {name = "Ash", data = {background = "gray", text = "white", boxColor = "lightGray",boxText = "black"}},
+    {name = "Light", data = {background = "lightGray", text = "black", boxColor = "gray", boxText = "white"}},
 }
 
 return M
