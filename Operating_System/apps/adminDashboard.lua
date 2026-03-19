@@ -5,6 +5,7 @@ local perms = require("lib.permissions")
 local logs = require("lib.writeLog")
 local settings = require("lib.settingsManager")
 local state = require("lib.state")
+local cr = require("UI.customRead")
 local header = require("UI.header")
 local navigation = require("UI.navigationHelp")
 local messages = require("UI.messages")
@@ -31,11 +32,11 @@ local function changeUserPassword(username)
         sleep(2)
         return false
     end
-    -- making sure that the password file exists
+
     local passwordPath = usersDir.. targetUser .."/password.txt"
     if not fs.exists(passwordPath) then 
         term.setTextColor(colors.red)
-        print("Password file not found")
+        print("Password file not found")   --- update this!
         term.setTextColor(colors.black)
         sleep(2)
         return false 
@@ -45,32 +46,20 @@ local function changeUserPassword(username)
     local oldPass = file.readAll()
     file.close()
     
-    while true do 
-        term.clear()
-        header.drawHeader(username)
-        header.drawClock()
-        term.setCursorPos(16,9)
-        write("Enter new password: ")
-        
-        local newPass = read("*")
+    while true do
+        local newPass = cr.customRead(25, "*", false, true, false, "", 3, nil)
+        if newPass == false then return end 
 
         if newPass == oldPass then
-            messages.errorPN(username, 2, 11, "New password must be different from old password") 
-        elseif #newPass < 5 then 
-             messages.errorPN(Username, 7, 11, "Password must be at least 5 characters")
+            messages.errorPN("New Password must be different from old password", nil, nil, 1, 2)
+        elseif #newPass < 5 then
+            messages.errorPN("Password must be at least 5 characters long", nil, nil, 1, 2)
         else 
             local f = fs.open(passwordPath, "w")
             f.write(newPass)
             f.close()
+            messages.successPN("Password updated", nil, nil, 1, 2)
             logs.logger("admin"," changed ", targetUser, "'s password")
-            term.clear()
-            header.drawHeader(username)
-            header.drawClock()
-            term.setCursorPos(18,10)
-            term.setTextColor(colors.lime)
-            write("Password updated")
-            term.setTextColor(colors.black)
-            sleep(2)
             return false
         end 
     end
@@ -99,7 +88,7 @@ local function deleteUser(username)
     if not targetUser then return false end 
 
     while true do
-        messages.confirm("Delete ",targetUser, "WARNING: This will delete all user's data")
+        messages.confirm("Delete ",targetUser, "WARNING: This will delete all user's data", -1)
         
         local event, param = os.pullEvent()
         
@@ -107,7 +96,7 @@ local function deleteUser(username)
             if param == keys.y or param == keys.z then 
                 fs.delete(usersToDelete..targetUser)
                 logs.logger("admin", " deleted ", targetUser)
-                messages.success(targetUser, " has been successfully deleted", 10, 9)
+                messages.success(targetUser, " has been successfully deleted")
                 return false
             elseif param == keys.n then return false end 
         end        
@@ -148,7 +137,7 @@ local function promoteToAdmin(username)
         sleep(2)
     else
         while true do 
-            messages.confirm("promote ", targetUser,"WARNING: This will grant the user higher power!")
+            messages.confirm("Promote ", targetUser.." to admin","WARNING: This will grant the user higher power!", -1)
         
             local event, param = os.pullEvent()
             if event == "key" then 
@@ -162,7 +151,7 @@ local function promoteToAdmin(username)
                     file.close()
                     logs.logger("admin", " promoted ", targetUser, " to admin")
                     term.clear()
-                    messages.success(targetUser, " has been promoted to admin", 10, 9)
+                    messages.success(targetUser, " has been promoted to admin")
                     return false end 
                 elseif param == keys.n then 
                     return false 
@@ -216,7 +205,7 @@ local function demoteAdmin(username)
         sleep(2)
     else
         while true do
-            messages.confirm("Demote ", targetUser, "", 16, 9)
+            messages.confirm("Demote ", targetUser, "", 0)
        
             local event, param = os.pullEvent()
 
@@ -230,7 +219,7 @@ local function demoteAdmin(username)
                     file.write(textutils.serialize(meta))
                     file.close()
                     logs.logger("admin", " demoted ", targetUser, " from admin to user")
-                    messages.success(targetUser, " has been demoted", 16,9)
+                    messages.success(targetUser, " has been demoted")
                     return false
                 elseif param == keys.n then 
                     return false end
