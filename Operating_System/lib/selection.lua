@@ -4,6 +4,7 @@ local header = require("UI.header")
 local state = require("lib.state")
 local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
+local ct = require("lib.centerText")
 local defaultSettings = settingsLib.defaultSettings()
 local powerLib = require("lib.power")
 local powerOptionsActions = powerLib.powerOptionsActions
@@ -23,9 +24,9 @@ local function list(optionsActions)
     return list
 end
 
--- ============================================================================================================
--- This function is the core UI handler, it draws the whole UI, decides what was selected and sends that trough
--- ============================================================================================================
+-- =========================================================================================================
+-- This function is the core UI handler, it draws the whole UI, decides what was selected and returns result
+-- =========================================================================================================
 function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType, title, tPosX, tPosY, canExit)
     if type(powerOptionsActions) ~= "table" then 
         error("SelectionLib: PowerLib isn't a table!")
@@ -74,14 +75,12 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
     local scroll = 0        
     local topLines = Y1
     local bottomLines = 4
-    local startX = X1
     local width, height = term.getSize()     
     local visible = height - topLines - bottomLines
-   
-    local clockTimer = os.startTimer(1)
     term.setCursorBlink(false)
 
     while true do
+        local clockTimer = os.startTimer(1)
         local username = state.getUsername()
         local getSettings = settings.loadSettings(username)
         local backKeyString = settings.current.returnKey
@@ -97,13 +96,12 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
         term.clear()
         header.drawHeader(username)
         header.drawClock()
-        term.setCursorPos(tPosX, tPosY)
-        write(title)
+        ct.centerText(title, 3, 1, nil)
         navigation.helper(navigationText) 
-        -- UI drawing and scrolling math
+        -- UI drawing logic and scrolling math
         for i = scroll + 1, math.min(scroll + visible, #optionsActions) do 
             local Ypos = topLines +  (i - scroll)
-            term.setCursorPos(startX, Ypos)
+            term.setCursorPos(X1, Ypos)
             if activeMenu == "main" and i == mainSelected then
                 write("["..optionsActions[i].name.."]")
             else
@@ -111,13 +109,18 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
             end
         end
 
-        for i, opt in ipairs(powerOptionsActions) do 
-                term.setCursorPos(powerX, powerY + i - 1)
-                if activeMenu == "power" and i == powerSelected then 
-                    write("["..opt.name.."]")
-                else
-                    write(" "..opt.name.." ")
+        for i, opt in ipairs(powerOptionsActions) do
+            local text
+            if activeMenu == "power" and i == powerSelected then 
+                text = "["..opt.name.."]"
+            else
+                text = " "..opt.name.." "
             end
+
+            local x = width - #text + 1
+            local y = height - #powerOptionsActions + i - 1
+            term.setCursorPos(x,y + 1 )
+            write(text)
         end
 
         local event, param = os.pullEvent()
