@@ -1,92 +1,87 @@
---required modules
-local users = require("lib.users")
+local defaultAppsLib = require("lib.defaultApps")
+local defaultApps = defaultAppsLib.defaultApps()
+local defaultSettingsLib = require("lib.defaultSettings")
+local defaultSettings = defaultSettingsLib.defaultSettings()
+local settings = require("lib.settingsManager")
+local powerLib = require("lib.power")
+local powerOptionsActions = powerLib.powerOptionsActions
 local perms = require("lib.permissions")
+local users = require("lib.users")
 local state = require("lib.state")
 local logs = require("lib.writeLog")
-local header = require("UI.header")
-local messages = require("UI.messages")
-local navigation = require("UI.navigationHelp")
-local powerLib = require("lib.power")
+local ct = require("lib.centerText")
+local cr = require("UI.customRead")
 local selectionLib = require("lib.selection")
-local powerOptionsActions = powerLib.powerOptionsActions
-local settings = require("lib.settingsManager")
-local settingsLib = require("lib.defaultSettings")
-local defaultSettings = settingsLib.defaultSettings()
+local messages = require("UI.messages")
+local header = require("UI.header")
+local navigation = require("UI.navigationHelp")
+local box = require("UI.drawBox")
 
 state.setUsername()
 
--- =======================================
--- Draws the boxes for pass and name input
--- =======================================
-local function drawBox(x, y, width, height, color)
-    term.setBackgroundColor(color)
-    for i = 1, height do
-        term.setCursorPos(x, y + i - 1)
-        write(string.rep(" ", width))
+-- ================================================================================
+-- Draws UI, waits for input, checks name and pass againts stored values, evaluates
+-- ================================================================================
+local function login()
+    while true do
+        term.setBackgroundColor(settings.current.background)
+        term.setTextColor(settings.current.background)
+        term.clear()
+
+        local username, pass = cr.customRead(25, "*", true, true, false, "=== User login ===", 1, nil)
+        if username == false then return end
+
+        local path = "operatingSystem/users/" .. username.."/password.txt"
+
+        if not fs.exists(path) then
+            messages.errorPN("Invalid username or password", nil, nil, 1, 4)
+        else   
+            local file = fs.open(path, "r")
+            local stored = file.readAll()
+            file.close()
+        
+            if stored == pass then
+                term.clear()
+                ct.centerText("Loading system", nil, 1)
+                for load = 1, 3 do
+                    write(".")
+                    sleep(1)
+                end
+                term.clear()
+                ct.centerText("Welcome "..username, nil, 1)
+                sleep(1)
+                state.setUsername(username)
+                logs.logger("login", " logged in")
+                shell.run("desktop.lua")
+                return true 
+            else
+                messages.errorPN("Invalid username or password!", nil, nil, 1, 4)
+            end
+        end
     end
 end
 
--- ==============================================================================
--- Draws the register UI and creates needed data/files for a user at registration
--- ==============================================================================
+-- =================================================================================================
+-- Draws UI, waits for input, checks name and pass againts existing and restricted values, evaluates
+-- =================================================================================================
 local function register()
     while true do
-        term.setBackgroundColor(colors.lightGray)
-        term.setTextColor(colors.black)
-        term.clear()
-
-        -- Title + date and time 
-        term.setCursorPos(13, 1)
-        write("=== Create your account ===")
-        header.drawClock()
-        header.drawHeader()
-
-        -- Username label
-        term.setCursorPos(13, 6)
-        write("Username:")
-        -- Username box
-        drawBox(13, 7, 26, 1, colors.black)
-
-        -- Password label
-        term.setBackgroundColor(colors.lightGray)
-        term.setCursorPos(13, 9)
-        write("Password:")
-        -- Password box
-        drawBox(13, 10, 26, 1, colors.black)
-       
-        -- navigation tips
-        term.setBackgroundColor(colors.lightGray)        
-        navigation.helper("press F1 or if you started typing then fail registration and press F1 to return","")
-        
-        -- event pulling
-        local event, key = os.pullEvent("key")
-        if key == keys.f1 then
-            return false 
-        end
-        -- collecting username input inside boxes
-        term.setBackgroundColor(colors.black)
-        term.setCursorPos(13,7)
-        term.setTextColor(colors.white)
-        local username = read()
-        --state.setUsername(username)
-        
-        -- collecting password input inside boxes 
-        term.setCursorPos(13,10)
-        local pass = read("*")
+        local username, pass = cr.customRead(25, "*", true, true, false, "=== Register ===", 1, nil)
+        if username == false then return end 
 
         -- all neccessary paths for creating/opening dirs/files for this function
         local userPath = "operatingSystem/users/"..username
         local passwordPath = userPath.."/password.txt"
         local appsPath = userPath .. "/apps.json"
         local metaPath = userPath .. "/meta.json"
-        if username == "admin" or username == "admins" or username == "dev" or username == "developer" or username == "developers" or username == "devs" or username == "guest" then 
-            messages.errorPN(nil, 17, 12, "Invalid username")
-        elseif #username < 3 then 
-            messages.errorPN(nil, 5, 12, "Username must be at least 3 characters long!")
+        if newName == "admin" or newName == "admins" or newName == "administrator" or newName == "administrators" or newName == "dev" or newName == "devs"or newName == "developer" or newName == "developers" then  
+            messages.errorPN("Invalid username!", nil, nil, 1, 4)
+        elseif #username < 3 then
+            messages.errorPN("Username must be at least 3 characters long", nil, nil, 1, 4) 
         elseif #pass < 5 then 
-            messages.errorPN(nil, 5, 12, "Password must be at least 5 characters long!")
+            messages.errorPN("Password must be at least 5 characters long", nil, nil, 1, 4)
         elseif fs.exists(userPath) then
-            messages.errorPN(nil, 13, 12, "This account already exists!")
+            messages.errorPN("This account already exists", nil, nil, 1, 4)
         else 
             settings.restoreSettings(username)
             local meta = users.createUserMeta(username)
@@ -96,7 +91,7 @@ local function register()
             f1.close()
 
             local f2 = fs.open(appsPath, "w")
-            f2.write(textutils.serialize(apps))
+            f2.write(textutils.serialize(defaultApps))
             f2.close()
 
             local f3 = fs.open(metaPath, "w")
@@ -104,109 +99,11 @@ local function register()
             f3.close()
 
             logs.logger("register", " registered", "", "", "", "",username)
-
-            term.setCursorPos(13,12)
-            term.setTextColor(colors.lime)
-            write("Account created successfuly")
-            sleep(2)
+            messages.successPN("Account created successfully", nil, nil, 1, 4)
             return false 
         end
     end  
 end
-
--- ================================================================================
--- Draws the login UI, checks for admin, passes along username and launches dekstop
--- ================================================================================
-local function login()
-    while true do
-        term.setBackgroundColor(colors.lightGray)
-        term.setTextColor(colors.black)
-        term.clear()
-
-        -- Title + date and time 
-        term.setCursorPos(17, 1)
-        write("=== User Login ===")
-        header.drawClock()
-        header.drawHeader()
-
-        -- Username label
-        term.setCursorPos(13, 6)
-        write("Username:")
-        -- Username box
-        drawBox(13, 7, 25, 1, colors.black)
-
-        -- Password label
-        term.setBackgroundColor(colors.lightGray)
-        term.setCursorPos(13, 9)
-        write("Password:")
-        -- Password box
-        drawBox(13, 10, 25, 1, colors.black)
-
-        term.setBackgroundColor(colors.lightGray)
-        navigation.helper("press F1  or if you started typing then fail login and press F1 to return","")
-        
-        local event, key = os.pullEvent("key")
-        if key == keys.f1 then
-            return false 
-        end
-
-        -- collecting username input inside box
-        term.setBackgroundColor(colors.black)
-        term.setCursorPos(13,7)
-        term.setTextColor(colors.white)
-        local username = read()
-        
-
-        -- collecting password input inside box
-        term.setCursorPos(13,10)
-        local pass = read("*")
-
-        -- neccessary path for this function
-        local path = "operatingSystem/users/" .. username.."/password.txt"
-  
-        --[[if username or password is wrong or account doesnt exist give the user a error message
-            if account exists, name and password is correct start loading the system, run
-            desktop.lua
-        ]]
-        if not fs.exists(path) then
-            term.setTextColor(colors.red)
-            term.setCursorPos(10,12)
-            print("Invalid username or password")
-            sleep(1)
-        else   
-            local file = fs.open(path, "r")
-            local stored = file.readAll()
-            file.close()
-        
-            if stored == pass then
-                term.setBackgroundColor(colors.lightGray)
-                term.clear()
-                term.setCursorPos(20,9)
-                term.setTextColor(colors.black)
-                write("Loading system")
-                for load = 1, 3 do
-                    write(".")
-                    sleep(1)
-                end
-                term.clear()
-                term.setCursorPos(20,9)
-                state.setUsername(username)
-                print("Welcome, " ..username)
-                sleep(1)
-                logs.logger("login", " logged in")
-                shell.run("desktop.lua")
-                return true 
-            else
-                term.setTextColor(colors.red)
-                term.setCursorPos(10,12)
-                print("Invalid username or password")
-                sleep(1)
-            end
-        end
-
-    end
-end
-
 -- =========================
 -- Options and actions table
 -- =========================
@@ -218,4 +115,4 @@ local optionsActions = {
 -- ==========================================
 -- Start of code - refer to the selection.lua
 -- ==========================================
-selectionLib.selection(powerOptionsActions, optionsActions, 22, 6, 42 ,18,"", "=== Choose an option ===",16, 3, false)
+selectionLib.selection(optionsActions, 22, 6, 42 ,18,"", "=== Choose an option ===",16, 3, false)
