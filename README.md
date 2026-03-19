@@ -31,7 +31,8 @@ Applications can be added on top of the system without modifying the core OS all
 - Multiple menus
 - Permission handling
 - Per user data
-- custom scrolling
+- Custom scrolling
+- Basic security features
   
 ### Admin Dashboard
 - User deletion
@@ -60,23 +61,31 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ## In progress
-- Terminate event handling 
+
   
 ### Planned
-- File explorer for desktop
 - Blackjack
 - Guessing game
 - Shop game
 - Custom installation process that uses pastebin combined with wget to let users download the code more comfortably
 - UI refactoring
+- Checking if some required data isn't missing at startup
   
 ### Ideas (not 100% planned)
 - Monitor support
 - Pocket computer support
 - Some application to send messages from computer to computer utilizing rednet
-- Some custom games that utilize turtles and rednet 
+- Some custom games that utilize turtles and rednet
+- File explorer 
 
 ## Changelog
+
+### v1.7
+- Terminate event is now being captured and evaluated for better security
+- Input boxes now look better and function way better
+- It is now possible to type and remove text inside input boxes and be able to return at the same time
+- Text should now be more centered
+- Clock updating is now more efficient and should work everywhere 
 
 ### v1.6
 - Changes to UI (mostly menu titles)
@@ -126,13 +135,9 @@ Applications can be added on top of the system without modifying the core OS all
 - Permission handling
 
 ### Known issues
-- When the read event is triggered during registration/login you can't use F1 to return, fix not found yet
-- "Guest" account has been temporarily removed and is not available in current versions
-- The clock won't update during login/register due to the read event being triggered
-- I haven't made a function to centralize text so if someone's username is long and you wish to delete them using the admin dashboard for example, it will put the text off balance
+- "Guest" account has been indefinitely removed
 - This code is NOT made for monitors, it is only made to be used on the terminal for now though i intend to introduce monitor support later in the future
 - Custom installation process is missing (no pastebin or wget) for now refer to the installation steps below
-- SECURITY WARNING: "terminate" event is not being handled so far so be aware that anyone even basic user can terminate the code at any time and access cc:tweaked terminal  
 
 ## Additional notes
 - This project is still under active development and serves primarily as a learning exercise
@@ -165,7 +170,7 @@ How to find your game files: (Normal launcher)
 7. Open the folder with the ID of your computer then paste all the files inside 
 
 # Vending machine game
-This program is currently a standalone and not a part of the OS
+This program is currently inactive and not part of the OS but will be later introduced
 
 ## features
 - User login system (for now)
