@@ -9,6 +9,7 @@ local M = {}
 -- This is simply a lib for printing out navigation tips for each and every menu
 -- =============================================================================
 function M.helper(t1, t2)
+    local width, height = term.getSize()
     local username = state.getUsername()
     local backKey = settings.current.returnKey or keys.f1
     local getSettings = settings.loadSettings(username)
@@ -21,9 +22,9 @@ function M.helper(t1, t2)
     end
 
     term.setTextColor(colors.yellow)
-    term.setCursorPos(1,18)
+    term.setCursorPos(1, height - 1)
     write(t1 or "Press "..backKey.." to return")
-    term.setCursorPos(1,19)
+    term.setCursorPos(1, height)
     write(t2 or "Use "..move.. " and enter to navigate")
     term.setTextColor(settings.current.text or colors.black)
 end
