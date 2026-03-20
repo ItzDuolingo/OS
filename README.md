@@ -1,6 +1,6 @@
 # Operating System (CC:Tweaked)
 
-#Introduction
+# Introduction
 A modular operating system-style environment for CC:Tweaked.
 The system provides a structured platform for building and running applications inside ComputerCraft computers. It includes a user authentication system, permission hierarchy, persistent user settings, logging and a keyboard-driven terminal UI framework.
 Applications can be added on top of the system without modifying the core OS allowing the environment to be extended with new programs and tools
