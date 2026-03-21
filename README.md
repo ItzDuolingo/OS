@@ -62,7 +62,7 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
-- Checking if some required data isn't missing at startup and overall modification of the startup file
+- Custom installation process
 ### Planned
 - Blackjack
 - Guessing game
@@ -135,7 +135,7 @@ Applications can be added on top of the system without modifying the core OS all
 
 ### Known issues
 - "Guest" account has been indefinitely removed
-- This code is NOT made for monitors, it is only made to be used on the terminal for now though i intend to introduce monitor support later in the future
+- This code is NOT made for monitors, it is only made to be used on the terminal for now, though i intend to introduce monitor support later in the future
 - Custom installation process is missing (no pastebin or wget) for now refer to the installation steps below
 
 ## Additional notes
