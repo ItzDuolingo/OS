@@ -143,9 +143,10 @@ Applications can be added on top of the system without modifying the core OS all
 - If you have any questions and/or suggestions on how i could change and/or improve the code feel free to contact me on discord at duolingo6954
 
 ### Installation 
-Open the ingame PC and paste this
+Open the ingame PC and paste:
 "pastebin get fMsiwmfh installer.lua"
-this should automatically download all the files, then reboot the computer which will make the startup file to run which will result in the OS running
+when it tells you that it successfully saved the file as installer run "installer.lua"
+this should automatically download all the files and reboot the computer which will make the startup file run which will result in the OS running
 
 
 # Vending machine game
