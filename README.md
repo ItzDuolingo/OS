@@ -15,7 +15,7 @@ Applications can be added on top of the system without modifying the core OS all
 - [Changelog](#changelog)
 - [Known Issues](#known-issues)
 - [Additional Notes](#additional-notes)
-- [Installation](#installation-steps)
+- [Installation](#installation)
 
 
 ## Features
