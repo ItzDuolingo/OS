@@ -64,6 +64,7 @@ Applications can be added on top of the system without modifying the core OS all
 ### In progress
 - Startup file modification
 ### Planned
+- Updater
 - Blackjack
 - Guessing game
 - Shop game
