@@ -134,10 +134,11 @@ Applications can be added on top of the system without modifying the core OS all
 - Permission handling
 
 ### Known issues
-- "Guest" account has been indefinitely removed
 - This code is NOT made for monitors, it is only made to be used on the terminal for now, though i intend to introduce monitor support later in the future
 
 ## Additional notes
+- "Guest" account has been indefinitely removed
+- Plans for file explorer have been scrapped indefinitely
 - This project is still under active development and serves primarily as a learning exercise
 - Expect incomplete features and bugs though i will try to lower the amount of bugs and try to fix most if not all before i release each version
 - If you have any questions and/or suggestions on how i could change and/or improve the code feel free to contact me on discord at duolingo6954
