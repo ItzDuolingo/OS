@@ -93,4 +93,4 @@ local optionsActions = {
     {name = "Uninstall apps", action = uninstallApp},
 }
 
-selectionLib.selection(optionsActions, 1, 5, 42, 18, "desktop", "=== App store ===", 20, 3, true)
+selectionLib.selection(optionsActions, 1, 3, "desktop", "=== App store ===", true, true)
