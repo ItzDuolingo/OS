@@ -43,7 +43,6 @@ while true do
         end
     
     end
-
-    
-    selectionLib.selection(optionsActions, 1, 5, 42, 18, "", "=== desktop ===", 20, 3, false)
+                           
+    selectionLib.selection(optionsActions, 1, 3, "", "=== desktop ===", false, true)
 end
