@@ -13,10 +13,6 @@ local box = require("UI.drawBox")
 local M = {}
 
 function M.terminateHandling(username)
-
-    --local event, param = os.pullEventRaw()
-
-    --if event == "terminate" then 
     local meta = users.loadUserMeta(username)
     if meta and meta.role == "dev" then 
         messages.success(nil, "Developer triggered terminate")
