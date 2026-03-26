@@ -62,13 +62,13 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
-- fixes and slight installer changes
+
 ### Planned
 - Updater
+- UI refactoring
 - Blackjack
 - Guessing game
 - Shop game
-- UI refactoring
   
 ### Ideas (not 100% planned)
 - Monitor support
@@ -79,6 +79,13 @@ Applications can be added on top of the system without modifying the core OS all
 
 ## Changelog
 
+### v1.8
+- Startup file added
+- System files checking and automatic repairing at each boot
+- Installer added (check [Installation](#installation))
+- Fixes regarding terminate
+- Slight UI changes
+- Ability to disrupt the booting process by holding down the delete button 
 ### v1.7
 - Terminate event is now being captured and evaluated for better security
 - Input boxes now look better and function way better
