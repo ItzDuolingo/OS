@@ -21,7 +21,7 @@ local powerOptionsActions = powerLib.powerOptionsActions
 local function changeUserPassword(username)
     local usersDir = "operatingSystem/users/"
     local usersList = fs.list(usersDir)
-    local targetUser = selectionLib.selection(usersList, 1, 5, 42, 18, "main menu", "=== Select a user to modify ===", 12, 3, true)
+    local targetUser = selectionLib.selection(usersList, 1, 3, "main menu", "=== Select a user to modify ===", true, true)
     
     if not targetUser then return false end 
 
@@ -85,7 +85,7 @@ local function deleteUser(username)
         messages.noUsers("No users to delete")
         return false
     end
-    local targetUser = selectionLib.selection(deletableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to delete ===", 10, 3, true) 
+    local targetUser = selectionLib.selection(deletableUsers, 1, 3, "main menu", "=== Select a user to delete ===", true, true) 
     if not targetUser then return false end 
 
     while true do
@@ -129,7 +129,7 @@ local function promoteToAdmin(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(promotableUsers,1, 5, 42, 18, "main menu", "=== Select a user to promote ===", 10, 3, true)
+    local targetUser = selectionLib.selection(promotableUsers, 1, 3,"main menu", "=== Select a user to promote ===", true, true)
     if not targetUser then return false end
 
     -- more perm checks 
@@ -189,7 +189,7 @@ local function demoteAdmin(username)
         return false
     end
 
-    local targetUser = selectionLib.selection(demotableUsers, 1, 5, 42, 18, "main menu", "=== Select a user to demote ===" ,10, 3, true )
+    local targetUser = selectionLib.selection(demotableUsers, 1, 3, "main menu", "=== Select a user to demote ===" , true, true )
     if not targetUser then return false end
     -- disallow currently logged in user to demote himself
     if targetUser == username then 
@@ -252,4 +252,4 @@ local optionsActions = {
 -- =============
 -- Start of code
 -- =============
-selectionLib.selection(optionsActions, 1, 5, 42, 18, "desktop", "=== Admin dashboard ===", 15, 3, true)
+selectionLib.selection(optionsActions, 1, 3, "desktop", "=== Admin dashboard ===", true, true)
