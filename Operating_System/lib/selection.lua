@@ -1,7 +1,9 @@
 -- required modules
 local navigation = require("UI.navigationHelp")
 local header = require("UI.header")
+local messages = require("UI.messages")
 local state = require("lib.state")
+local users = require("lib.users")
 local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
 local ct = require("lib.centerText")
@@ -27,41 +29,29 @@ end
 -- =========================================================================================================
 -- This function is the core UI handler, it draws the whole UI, decides what was selected and returns result
 -- =========================================================================================================
-function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType, title, tPosX, tPosY, canExit)
-    if type(powerOptionsActions) ~= "table" then 
-        error("SelectionLib: PowerLib isn't a table!")
-    end
-
+function M.selection(optionsActions, x, topLines, navigationTextType, title, canExit, canTerminate)
     if type(optionsActions) ~= "table" then 
         error("SelectionLib: [arg 1] OptionsActions isn't a table or wasn't normalized!")
     end 
 
-    if not X1 or not Y1 then
-        error("SelectionLib: [arg 2] OptionsActions table position is missing!")
-    end
-
-    if not powerY or not powerX then 
-        error("SelectionLib: [arg 3] Power table position is missing!")
-    end
+    if not topLines then 
+        error("SelectionLib.lua: [arg 2] topLines value not provided (must be a number)")
+    end 
 
     if not navigationTextType then 
-        error("SelectionLib.lua: [arg 4] Type of navigation text not provided!")
-    end
-
-    if username ~= nil and type(username) ~= "string" then
-        error("SelectionLib: Username must be nil or a string!")
+        error("SelectionLib.lua: [arg 3] Type of navigation text not provided!")
     end
 
     if not title then 
-        error("SelectionLib: [arg 5] Title text is missing!")
-    end
-
-    if not tPosX or not tPosY then 
-        error("SelectionLib: [arg 6] check if you aren't missing the titple positions")
+        error("SelectionLib: [arg 4] Title text is missing!")
     end
 
     if canExit == nil then 
-        error("SelectionLib: [arg 7] 'canExit' isn't a boolean value")
+        error("SelectionLib: [arg 5] 'canExit' isn't a boolean value")
+    end
+
+    if canTerminate == nil then 
+        error("selectionLib: [arg 6] 'canTerminate' isn't a boolean value")
     end
 
     if type(optionsActions[1]) == "string" then
@@ -73,11 +63,12 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
     local mainSelected = 1      
     local powerSelected = 1
     local scroll = 0        
-    local topLines = Y1
     local bottomLines = 4
     local width, height = term.getSize()     
     local visible = height - topLines - bottomLines
-    term.setCursorBlink(false)
+    local usableHeight = height - topLines - bottomLines
+    local startY = topLines + math.floor((usableHeight - visible) / 2 ) + 1 
+    local text
 
     while true do
         local clockTimer = os.startTimer(1)
@@ -100,17 +91,18 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
         navigation.helper(navigationText) 
         -- UI drawing logic and scrolling math
         for i = scroll + 1, math.min(scroll + visible, #optionsActions) do 
-            local Ypos = topLines +  (i - scroll)
-            term.setCursorPos(X1, Ypos)
             if activeMenu == "main" and i == mainSelected then
-                write("["..optionsActions[i].name.."]")
+                text = "["..optionsActions[i].name.."]"
             else
-                write(" "..optionsActions[i].name.." ")
+                text = " "..optionsActions[i].name.." "
             end
+            local y = startY + (i - scroll)
+            local drawX = x or math.floor((width - #text) / 2) + 1
+            term.setCursorPos(drawX, y)
+            write(text)
         end
 
         for i, opt in ipairs(powerOptionsActions) do
-            local text
             if activeMenu == "power" and i == powerSelected then 
                 text = "["..opt.name.."]"
             else
@@ -119,11 +111,11 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
 
             local x = width - #text + 1
             local y = height - #powerOptionsActions + i - 1
-            term.setCursorPos(x,y + 1 )
+            term.setCursorPos(x, y + 1)
             write(text)
         end
 
-        local event, param = os.pullEvent()
+        local event, param = os.pullEventRaw()
         -- updating the variables so that scrolling is possible and menu management
         if event == "key" then
             if param == keys[string.lower(getSettings.navigation.move.forward)] then
@@ -190,6 +182,19 @@ function M.selection(optionsActions, X1, Y1, powerX, powerY, navigationTextType,
         elseif event == "timer" and param == clockTimer then 
             header.drawClock()
             clockTimer = os.startTimer(1)
+        elseif event == "terminate" then
+            if canTerminate == true then  
+                local meta = users.loadUserMeta(username)
+                if meta and meta.role == "dev" then 
+                    messages.success(nil, "Developer triggered terminate")
+                    term.setBackgroundColor(colors.black)
+                    term.clear()
+                    term.setCursorPos(1,1)
+                    shell.run("shell")
+                else
+                    messages.error("You don't have permissions to perform this action", nil, 1, nil)
+                end
+            end
         end
     end
 end
