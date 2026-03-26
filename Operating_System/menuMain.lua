@@ -17,7 +17,7 @@ local header = require("UI.header")
 local navigation = require("UI.navigationHelp")
 local box = require("UI.drawBox")
 
-state.setUsername()
+state.setUsername() 
 
 -- ================================================================================
 -- Draws UI, waits for input, checks name and pass againts stored values, evaluates
@@ -115,4 +115,4 @@ local optionsActions = {
 -- ==========================================
 -- Start of code - refer to the selection.lua
 -- ==========================================
-selectionLib.selection(optionsActions, 22, 6, 42 ,18,"", "=== Choose an option ===",16, 3, false)
+selectionLib.selection(optionsActions, nil, 7 , "", "=== Choose an option ===", false, false)
