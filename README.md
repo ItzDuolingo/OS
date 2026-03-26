@@ -62,7 +62,7 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
-- Startup file modification
+- fixes and slight installer changes
 ### Planned
 - Updater
 - Blackjack
