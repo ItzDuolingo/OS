@@ -42,7 +42,7 @@ local function setTheme(username)
         })
     end
     
-    local chosenTheme = selectionLib.selection(themeOptions, 1, 5, 42, 18,  "main menu", "=== choose a theme ===", 18, 3, true )
+    local chosenTheme = selectionLib.selection(themeOptions, 1, 3, "main menu", "=== choose a theme ===", true, true )
     if chosenTheme == false then 
         return false
     end
@@ -68,7 +68,7 @@ local function toggleClock(username)
         })
     end
     
-    local chosen = selectionLib.selection(clockOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an option ===", 15, 3, true)
+    local chosen = selectionLib.selection(clockOptionsActions, 1, 3, "main menu", "=== Choose an option ===", true, true)
     
     if chosen == false then return false end 
 
@@ -98,7 +98,7 @@ local function changeTimeFormat(username)
         })
     end
 
-    local chosenFormat = selectionLib.selection(fomratOptions, 1, 5, 42, 18, "main menu", "=== Choose a format ===", 15, 3, true)
+    local chosenFormat = selectionLib.selection(fomratOptions, 1, 3, "main menu", "=== Choose a format ===", true, true)
 
     if chosenFormat == false then return false end 
 
@@ -125,7 +125,7 @@ local function backKeybind(username)
         })
     end
 
-    local chosenBackKey = selectionLib.selection(backKeyOptions, 1, 5, 42, 18, "main menu", "=== Choose a key ===", 17, 3, true)
+    local chosenBackKey = selectionLib.selection(backKeyOptions, 1, 3, "main menu", "=== Choose a key ===", true, true)
 
     if chosenBackKey == false then return false end 
 
@@ -184,7 +184,7 @@ local changeNavigOptionsActions = {
 
 local function changeNavigPreset(username)
     settings.loadSettings(username)
-    selectionLib.selection(changeNavigOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose a preset ===", 15, 3, true)
+    selectionLib.selection(changeNavigOptionsActions, 1, 3,"main menu", "=== Choose a preset ===", true, true)
 end
 
 local navigationPresetOptionsActions = { 
@@ -193,7 +193,7 @@ local navigationPresetOptionsActions = {
 }
 
 local function keybindsMenu(username)
-    selectionLib.selection(navigationPresetOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an option ===", 15, 3, true)
+    selectionLib.selection(navigationPresetOptionsActions, 1, 3, "main menu", "=== Choose an option ===", true, true)
 end
 
 -- ==========================================================
@@ -290,4 +290,4 @@ local optionsActions = {
     {name = "Change username", action = changeUsername},
 }
 
-selectionLib.selection(optionsActions, 1, 5, 42, 18, "desktop", "=== Settings ===", 20, 3, true)
+selectionLib.selection(optionsActions, 1, 3,"desktop", "=== Settings ===", true, true)
