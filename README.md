@@ -62,9 +62,9 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
+Updater
 
 ### Planned
-- Updater
 - UI refactoring
 - Blackjack
 - Guessing game
@@ -85,7 +85,8 @@ Applications can be added on top of the system without modifying the core OS all
 - Installer added (check [Installation](#installation))
 - Fixes regarding terminate
 - Slight UI changes
-- Ability to disrupt the booting process by holding down the delete button 
+- Ability to disrupt the booting process by holding down the delete button
+
 ### v1.7
 - Terminate event is now being captured and evaluated for better security
 - Input boxes now look better and function way better
