@@ -7,6 +7,7 @@ local users = require("lib.users")
 local settings = require("lib.settingsManager")
 local settingsLib = require("lib.defaultSettings")
 local ct = require("lib.centerText")
+local terminate = require("lib.terminate")
 local defaultSettings = settingsLib.defaultSettings()
 local powerLib = require("lib.power")
 local powerOptionsActions = powerLib.powerOptionsActions
@@ -183,17 +184,8 @@ function M.selection(optionsActions, x, topLines, navigationTextType, title, can
             header.drawClock()
             clockTimer = os.startTimer(1)
         elseif event == "terminate" then
-            if canTerminate == true then  
-                local meta = users.loadUserMeta(username)
-                if meta and meta.role == "dev" then 
-                    messages.success(nil, "Developer triggered terminate")
-                    term.setBackgroundColor(colors.black)
-                    term.clear()
-                    term.setCursorPos(1,1)
-                    shell.run("shell")
-                else
-                    messages.error("You don't have permissions to perform this action", nil, 1, nil)
-                end
+            if canTerminate == true then
+                terminate.terminateHandling(username)
             end
         end
     end
