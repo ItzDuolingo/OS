@@ -231,7 +231,7 @@ local function changePassword(username)
     local passwordPath = "/operatingSystem/users/"..username.."/password.txt"
 
     while true do        
-        local newPass = cr.customRead(27, "*", false, true, false,  "", 1, nil)
+        local newPass = cr.customRead(27, "*", false, true, false,  "", 1, nil, true)
 
         if newPass == false then return end 
 
@@ -259,7 +259,7 @@ end
 -- =============================================
 local function changeUsername(username)
     while true do 
-        local newName = cr.customRead(27, "*", true, false, false, "", 1, nil)
+        local newName = cr.customRead(27, "*", true, false, false, "", 1, nil, true)
         if newName == false then return end 
         
         if #newName < 3 then
