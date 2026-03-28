@@ -6,8 +6,7 @@ local libPath = rootCodePath.."lib"
 local uiPath = rootCodePath.."UI"
 local appsPath = rootCodePath.."apps"
 local userAppsPath =  appsPath.."/userApps"
- 
- 
+  
 local required = {
     dirs = {
         {path = rootPath},
@@ -79,6 +78,7 @@ for _, i in ipairs(required.files) do
             term.setCursorPos(1, 4)
             term.setTextColor(colors.black)
             shell.run("wget", i.URL, i.path)
+            sleep(1)
             term.clear()
         elseif i.path == rootPath.."state.json" then 
             local file = fs.open(i.path, "w")
