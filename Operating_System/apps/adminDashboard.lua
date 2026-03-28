@@ -48,7 +48,7 @@ local function changeUserPassword(username)
     file.close()
     
     while true do
-        local newPass = cr.customRead(25, "*", false, true, false, "", 3, nil)
+        local newPass = cr.customRead(25, "*", false, true, false, "", 3, nil, true)
         if newPass == false then return end 
 
         if newPass == oldPass then
