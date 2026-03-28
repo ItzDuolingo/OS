@@ -23,7 +23,7 @@ end
 -- =============================================================================================
 -- This message asks the user whether they want to confirm or deny the action up ahead using Y/N
 -- =============================================================================================
-function M.confirm(t1, targetUser, t2, yOffset, text)
+function M.confirm(t1, targetUser, t2, yOffset)
     term.clear() 
     header.drawHeader(username)
     header.drawClock()
@@ -31,7 +31,7 @@ function M.confirm(t1, targetUser, t2, yOffset, text)
     if targetUser then 
         ct.centerText(t1..targetUser.."? [Y/N]", nil, 1, yOffset)
     else
-        ct.centerText(text, nil, 1, yOffset)
+        ct.centerText(t1, nil, 1, yOffset)
     end
 
     if t2 then
@@ -61,7 +61,7 @@ end
 -- =====================
 function M.error(text, y, textHeight, yOffset)
     term.clear()
-    header.drawHeader()
+    header.drawHeader(username)
     header.drawClock()
     term.setTextColor(colors.red)
     ct.centerText(text, y, textHeight, yOffset)
