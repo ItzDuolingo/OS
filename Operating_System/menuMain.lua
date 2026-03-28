@@ -1,3 +1,6 @@
+package.path = "/operatingSystemCode/?.lua;/operatingSystemCode/?/init.lua;" .. package.path
+shell.setDir("operatingSystemCode")
+
 local defaultAppsLib = require("lib.defaultApps")
 local defaultApps = defaultAppsLib.defaultApps()
 local defaultSettingsLib = require("lib.defaultSettings")
@@ -28,7 +31,7 @@ local function login()
         term.setTextColor(settings.current.background)
         term.clear()
 
-        local username, pass = cr.customRead(25, "*", true, true, false, "=== User login ===", 1, nil)
+        local username, pass = cr.customRead(25, "*", true, true, false, "=== User login ===", 1, nil, false)
         if username == false then return end
 
         local path = "operatingSystem/users/" .. username.."/password.txt"
@@ -66,7 +69,7 @@ end
 -- =================================================================================================
 local function register()
     while true do
-        local username, pass = cr.customRead(25, "*", true, true, false, "=== Register ===", 1, nil)
+        local username, pass = cr.customRead(25, "*", true, true, false, "=== Register ===", 1, nil, false)
         if username == false then return end 
 
         -- all neccessary paths for creating/opening dirs/files for this function
