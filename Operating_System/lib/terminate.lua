@@ -6,7 +6,6 @@ local users = require("lib.users")
 local state = require("lib.state")
 local logs = require("lib.writeLog")
 local centerText = require("lib.centerText")
-local selectionLib = require("lib.selection")
 local messages = require("UI.messages")
 local box = require("UI.drawBox")
 
