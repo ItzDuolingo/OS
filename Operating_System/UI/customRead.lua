@@ -4,6 +4,7 @@ local settings = require("lib.settingsManager")
 local state = require("lib.state")
 local logs = require("lib.writeLog")
 local ct = require("lib.centerText")
+local terminate = require("lib.terminate")
 local messages = require("UI.messages")
 local navigation = require("UI.navigationHelp")
 local header = require("UI.header")
@@ -30,7 +31,7 @@ end
 -- ======================================================================================================================================================================================
 -- Gets all the arguments and based on those values they evaluate what should happen, draws a box/es to collect input and return on enter, handle keys like return keys, enter, backspace
 -- ======================================================================================================================================================================================
-function M.customRead(maxLen, maskChar, usernameBox, passBox, normalBox, headerText, headerY, normalBoxInput)
+function M.customRead(maxLen, maskChar, usernameBox, passBox, normalBox, headerText, headerY, normalBoxInput, canTerminate)
     local width, height = term.getSize()
     local Normaltext =  ""
     local usernameText = ""
@@ -45,8 +46,6 @@ function M.customRead(maxLen, maskChar, usernameBox, passBox, normalBox, headerT
     local boxtype
     local display
 
-    
-    
     if usernameBox and passBox then
         activeBox = "usernameBox"
         amountOfBoxes = 2 
@@ -133,7 +132,7 @@ function M.customRead(maxLen, maskChar, usernameBox, passBox, normalBox, headerT
         term.setBackgroundColor(settings.current.background)
         term.setTextColor(settings.current.text)
         header.drawClock()   
-        local event, param = os.pullEvent()
+        local event, param = os.pullEventRaw()
 
         if event == "char" then
             if activeBox == "usernameBox" then  
@@ -224,6 +223,10 @@ function M.customRead(maxLen, maskChar, usernameBox, passBox, normalBox, headerT
         elseif event == "timer" then 
             header.drawClock()
             clockTimer = os.startTimer(1)
+        elseif event == "terminate" then 
+            if canTerminate == true then 
+                terminate.terminateHandling(username)
+            end
         end
     end
 end
