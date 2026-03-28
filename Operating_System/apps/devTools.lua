@@ -31,7 +31,7 @@ local function fullAccess(username)
                 -- consume "char" event to prevent read() from capturing Y/Z input
                 os.pullEvent("char")
 
-                local input = cr.customRead(27, nil, false, false, true, "", 3, "'terminal'")
+                local input = cr.customRead(27, nil, false, false, true, "", 3, "'terminal'", true)
                 if input == false then return end 
 
                 if input == "terminal" then
