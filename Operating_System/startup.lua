@@ -28,6 +28,8 @@ local required = {
         {URL = nil,                                   path = logsPath.."login.txt"},
         {URL = nil,                                   path = logsPath.."register.txt"},
         {URL = nil,                                   path = logsPath.."settings.txt"},
+        {URL = baseURL.."version",                    path = rootCodePath.."version.txt"},
+        {URL = baseURL.."updater.lua",                path = "updater.lua"},
         {URL = baseURL.."menuMain.lua",               path = rootCodePath.."menuMain.lua"},
         {URL = baseURL.."desktop.lua",                path = rootCodePath.."desktop.lua"},
         {URL = baseURL.."UI/customRead.lua",          path = uiPath.."/customRead.lua"},
@@ -91,30 +93,4 @@ end
 
 local ct = require("lib.centerText")
 ct.centerText("Booting up...", nil, 1)
-
-local timer = os.startTimer(2)
-
-while true do 
-    local event, param, isHeld = os.pullEvent()
-
-    if event == "timer" then 
-        if param == timer then 
-            break 
-        end
-
-    elseif event == "key" then 
-        if isHeld then 
-            if param == keys.delete then 
-                ct.centerText("Booting was canceled", nil, 1)
-                sleep(2)
-                term.setBackgroundColor(colors.black)
-                term.clear()
-                term.setCursorPos(1,1)
-                return 
-            end
-        end
-    end
-end
-
-shell.setDir("operatingSystemCode")
-shell.run("menuMain.lua")
+shell.run("updater.lua")
