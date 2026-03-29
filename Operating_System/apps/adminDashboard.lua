@@ -37,7 +37,7 @@ local function changeUserPassword(username)
     local passwordPath = usersDir.. targetUser .."/password.txt"
     if not fs.exists(passwordPath) then 
         term.setTextColor(colors.red)
-        print("Password file not found")   --- update this!
+        print("Password file not found") 
         term.setTextColor(colors.black)
         sleep(2)
         return false 
