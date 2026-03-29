@@ -201,19 +201,16 @@ end
 -- ==========================================================
 local function restoreToDefaults(username)
     while true do
-        messages.confirm(nil, nil, nil, nil, "Reset settings to default? [Y/N]")
+        --messages.confirm("Promote ", targetUser.. " to developer", "Warning: This will grant user higher power!", -1 )
+        --messages.confirm(nil, nil, nil, nil, "Reset settings to default? [Y/N]")
+        messages.confirm("Reset settins to default? [Y/N]", nil, nil, nil)
 
         local event, param = os.pullEventRaw()
         if event == "key" then 
-            if param == keys.y or param == keys.z then 
+            if param == keys.y or param == keys.z then                 
                 settings.restoreSettings(username)
-                term.clear()
-                header.drawHeader(username)
-                header.drawClock()
-                term.setCursorPos(6,9)
-                term.setTextColor(colors.lime)
-                write("Your settings have been reset to default")
-                sleep(2)
+                messages.success(nil, "Your settings have been reset to default")
+                logs.logger("settings", " reset settings to default")
                 return false
             elseif param == keys.n then 
                 return false 
@@ -274,7 +271,7 @@ local function changeUsername(username)
             logs.logger("settings", " changed ", "username to "..newName)
             fs.move(oldNameDir, newNameDir)
             state.setUsername(newName)
-            messages.setSettings(11, 9, "username", username)
+            messages.successPN("Username updated", nil, nil, 1, 2)
             return false
         end
     end
