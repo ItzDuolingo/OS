@@ -21,7 +21,6 @@ local powerOptionsActions = powerLib.powerOptionsActions
 -- This gives the developer full uncontrolled access to the cc:tweaked shell/terminal
 -- ==================================================================================
 local function fullAccess(username)
-    --messages.confirm(nil, nil, "Warning: This gives you full access to the terminal", -1, "Are you sure you want access to the terminal? [Y/N]")
     messages.confirm("Access the terminal? [Y/N] ", nil, "Warning: This gives you full access to the terminal", -1)
      while true do
         local event, param = os.pullEventRaw()
