@@ -4,9 +4,10 @@ function M.defaultSettings()
     return {
         ui = {
             background = "lightGray",
+            boxColor = "black",
             textColor = {
                 ui = "black",
-                navigation = "yellow"
+                boxText  = "white",
             }
         },
 
