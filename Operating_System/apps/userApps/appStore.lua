@@ -34,8 +34,7 @@ local function installApp(username)
         messages.noUsers("No apps to install") -- this module is normally used for devtools and admin dashboard but i didnt see a point in making a new one so i used this one
         return false
     end
-
-    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an app ===", 17, 3, true)
+    local chosenApp = selectionLib.selection(appOptionsActions, 1, 3, "main menu", "=== Choose an app ===", true, true)
 
     if chosenApp == false then return false end 
     rawChosenApp = chosenApp:gsub(" ", "_")
@@ -75,7 +74,7 @@ local function uninstallApp(username)
         return false
     end 
 
-    local chosenApp = selectionLib.selection(appOptionsActions, 1, 5, 42, 18, "main menu", "=== Choose an app ===", 17, 3, true)
+    local chosenApp = selectionLib.selection(appOptionsActions, 1, 3, "main menu", "=== Choose an app ===", true, true)
 
     if chosenApp == false then return false end
     rawChosenApp = chosenApp:gsub(" ", "_")
