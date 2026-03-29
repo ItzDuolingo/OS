@@ -15,6 +15,6 @@ function M.centerText(text, y, textHeight, yOffset)
     end
     term.setCursorPos(x,y)
     write(text)
-end
+end 
 
 return M
