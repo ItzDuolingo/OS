@@ -20,7 +20,7 @@ Applications can be added on top of the system without modifying the core OS all
 
 ## Features
 - User login/register system
-- Basic meta data handling (.json files)
+- User meta data
 - Dev -> Admin -> User hierarchy
 - File I/O
 - Admin dashboard
@@ -31,9 +31,10 @@ Applications can be added on top of the system without modifying the core OS all
 - UI Drawing and navigation
 - Multiple menus
 - Permission handling
-- Per user data
 - Custom scrolling
 - Basic security features
+- Checking and repairing files at startup
+- Upadter that runs every boot to ensure up to date version
   
 ### Admin Dashboard
 - User deletion
@@ -62,10 +63,9 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
-Updater
+- UI refactoring
 
 ### Planned
-- UI refactoring
 - Blackjack
 - Guessing game
 - Shop game
@@ -78,6 +78,11 @@ Updater
 - File explorer 
 
 ## Changelog
+
+### v1.9
+- Updater added
+- Startup file fixes/modifications
+- Bug fixes
 
 ### v1.8
 - Startup file added
