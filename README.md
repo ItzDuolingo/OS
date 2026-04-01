@@ -66,6 +66,7 @@ Applications can be added on top of the system without modifying the core OS all
 - UI refactoring
 
 ### Planned
+- Fixing UI flickering
 - Blackjack
 - Guessing game
 - Shop game
