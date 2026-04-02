@@ -63,10 +63,9 @@ Applications can be added on top of the system without modifying the core OS all
 # Roadmap
 
 ### In progress
-- UI refactoring
+- Fixing UI flickering
 
 ### Planned
-- Fixing UI flickering
 - Blackjack
 - Guessing game
 - Shop game
